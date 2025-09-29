@@ -88,9 +88,9 @@ export class FileExplorerComponent implements OnInit {
 				this.router.navigate(['/', ...targetPath]).then(() => {
 					// Ensure root folder is loaded if we're at root
 					if (targetPath.length === 0) {
-						this.loadFolderContent(null, []);
+						this.loadFolderContent(null, [], true);
 					}
-					// Show modal after navigation
+					// Show modal after navigation and loading
 					setTimeout(() => {
 						this.displayErrorModal();
 					}, 1000);
@@ -117,8 +117,27 @@ export class FileExplorerComponent implements OnInit {
 		});
 	}
 
-	private loadFolderContent(folderId: string | null, path: string[]) {
-		this.fileManagerService.navigateToPath(path, folderId);
+	private loadFolderContent(folderId: string | null, path: string[], preserveError: boolean = false) {
+		if (preserveError) {
+			// Store the current error state
+			const currentError = this.fileManagerService.error();
+			const currentMissingFolder = this.fileManagerService.missingFolderName();
+			
+			this.fileManagerService.navigateToPath(path, folderId);
+			
+			// Restore the error state after navigation
+			if (currentError) {
+				setTimeout(() => {
+					// Re-trigger the error effect by setting the error again
+					this.fileManagerService['_error'].set(currentError);
+					if (currentMissingFolder) {
+						this.fileManagerService['_missingFolderName'].set(currentMissingFolder);
+					}
+				}, 100);
+			}
+		} else {
+			this.fileManagerService.navigateToPath(path, folderId);
+		}
 	}
 
 	private loadFolderByPath(folderPath: string[]) {
