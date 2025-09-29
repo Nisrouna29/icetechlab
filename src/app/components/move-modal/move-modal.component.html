@@ -26,18 +26,18 @@
 				[class.bg-blue-50]="selectedDestination() === node.folder.id"
 				[style.padding-left]="(node.level * 20 + 12) + 'px'"
 				(click)="selectDestination(node.folder.id)">
-				@if (hasChildren(node)) {
-				<button
-					class="mr-2 text-gray-400 hover:text-gray-600 w-4 h-4 flex items-center justify-center"
-					(click)="toggleFolder(node); $event.stopPropagation()">
-					<i
-						class="fa-solid text-xs"
-						[class.fa-chevron-right]="!isExpanded(node.folder.id)"
-						[class.fa-chevron-down]="isExpanded(node.folder.id)"></i>
-				</button>
-				} @else {
-				<div class="w-4 mr-2"></div>
-				}
+				<div class="w-4 h-4 mr-2 flex items-center justify-center">
+					@if (hasChildren(node)) {
+					<button
+						class="text-gray-400 hover:text-gray-600 w-4 h-4 flex items-center justify-center"
+						(click)="toggleFolder(node); $event.stopPropagation()">
+						<i
+							class="fa-solid text-xs"
+							[class.fa-chevron-right]="!isExpanded(node.folder.id)"
+							[class.fa-chevron-down]="isExpanded(node.folder.id)"></i>
+					</button>
+					}
+				</div>
 				<i
 					class="fa-solid {{ node.folder.icon }} {{ node.folder.color }} mr-3"></i>
 				<span>{{ node.folder.name }}</span>

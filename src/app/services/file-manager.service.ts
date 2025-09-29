@@ -880,6 +880,10 @@ export class FileManagerService {
 			tap(fileItem => {
 				// Reload current folder to show the updated name
 				this.loadFolderContents(this._currentFolderId());
+				// Refresh folder list for move modal if it's a folder
+				if (fileItem.type === 'folder') {
+					this.getAllFolders().subscribe();
+				}
 				// Show success snackbar
 				this.snackbarService.success(
 					`${fileItem.type === 'folder' ? 'Folder' : 'File'} "${fileItem.name}" renamed successfully!`

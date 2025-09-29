@@ -37,27 +37,43 @@ export class MoveModalComponent {
 		const currentItem = this.fileManagerService.itemToMove();
 		const currentFolderId = this.fileManagerService.currentFolderId();
 
-		// Filter out the current folder, the item being moved, and its children
-		const filteredFolders = allFolders.filter(folder => {
-			if (folder.id === currentFolderId) return false;
-			if (
-				currentItem &&
-				currentItem.type === 'folder' &&
-				folder.id === currentItem.id
-			)
-				return false;
-			// Exclude children of the folder being moved
-			if (
-				currentItem &&
-				currentItem.type === 'folder' &&
-				this.isDescendant(folder, currentItem.id, allFolders)
-			) {
-				return false;
-			}
-			return true;
-		});
+		// First, identify folders to exclude
+		const excludedFolderIds = new Set<string>();
+		
+		// Exclude current folder
+		if (currentFolderId) {
+			excludedFolderIds.add(currentFolderId);
+		}
+		
+		// Exclude the item being moved if it's a folder
+		if (currentItem && currentItem.type === 'folder') {
+			excludedFolderIds.add(currentItem.id);
+		}
+		
+		// Exclude children of the folder being moved
+		if (currentItem && currentItem.type === 'folder') {
+			allFolders.forEach(folder => {
+				if (this.isDescendant(folder, currentItem.id, allFolders)) {
+					excludedFolderIds.add(folder.id);
+				}
+			});
+		}
 
-		return this.buildFolderTree(filteredFolders);
+		// Get valid folders (not excluded)
+		const validFolders = allFolders.filter(folder => !excludedFolderIds.has(folder.id));
+		
+		// Include all ancestors of valid folders to maintain tree structure
+		const foldersWithAncestors = this.includeAncestors(validFolders, allFolders);
+
+		// Debug: Check if prestassart and images are in the tree
+		const prestassart = foldersWithAncestors.find(f => f.name === 'prestassart');
+		const images = foldersWithAncestors.find(f => f.name === 'images');
+		if (prestassart && images) {
+			console.log('prestassart:', prestassart);
+			console.log('images:', images);
+		}
+
+		return this.buildFolderTree(foldersWithAncestors);
 	});
 
 	private buildFolderTree(folders: FileItem[]): FolderTreeNode[] {
@@ -85,11 +101,48 @@ export class MoveModalComponent {
 				parentNode.children.push(node);
 				node.level = parentNode.level + 1;
 			} else {
+				// If parent is not in the map, this is a root node
 				rootNodes.push(node);
 			}
 		});
 
+		// Debug: Log the final tree structure
+		console.log('Final tree structure:', rootNodes.map(node => this.logTreeStructure(node, 0)));
+		
 		return rootNodes;
+	}
+
+	private includeAncestors(validFolders: FileItem[], allFolders: FileItem[]): FileItem[] {
+		const result = new Set<string>();
+		
+		// Add all valid folders
+		validFolders.forEach(folder => result.add(folder.id));
+		
+		// For each valid folder, add all its ancestors
+		validFolders.forEach(folder => {
+			let current = folder;
+			while (current.parentId) {
+				const parent = allFolders.find(f => f.id === current.parentId);
+				if (parent) {
+					result.add(parent.id);
+					current = parent;
+				} else {
+					break;
+				}
+			}
+		});
+		
+		// Return all folders (valid + ancestors) in the same order as allFolders
+		return allFolders.filter(folder => result.has(folder.id));
+	}
+
+	private logTreeStructure(node: FolderTreeNode, level: number): any {
+		const indent = '  '.repeat(level);
+		return {
+			name: node.folder.name,
+			level: node.level,
+			children: node.children.map(child => this.logTreeStructure(child, level + 1))
+		};
 	}
 
 	private isDescendant(
@@ -165,6 +218,8 @@ export class MoveModalComponent {
 		if (itemToMove) {
 			this.fileManagerService.moveItem(itemToMove.id, destination).subscribe({
 				next: () => {
+					// Refresh the folder list to update the tree
+					this.fileManagerService.getAllFolders().subscribe();
 					this.fileManagerService.clearItemToMove();
 					this.close();
 				},
