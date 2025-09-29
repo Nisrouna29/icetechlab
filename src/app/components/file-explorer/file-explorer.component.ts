@@ -83,9 +83,13 @@ export class FileExplorerComponent implements OnInit {
 				
 				// Get the last valid path and navigate to it
 				const lastValid = this.fileManagerService.getLastValidPath();
-				const targetPath = lastValid.path.length === 0 ? [''] : lastValid.path;
+				const targetPath = lastValid.path.length === 0 ? [] : lastValid.path;
 				
 				this.router.navigate(['/', ...targetPath]).then(() => {
+					// Ensure root folder is loaded if we're at root
+					if (targetPath.length === 0) {
+						this.loadFolderContent(null, []);
+					}
 					// Show modal after navigation
 					setTimeout(() => {
 						this.displayErrorModal();
