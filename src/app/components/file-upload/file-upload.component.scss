@@ -1,0 +1,12 @@
+.file-upload-container {
+	transition: all 0.3s ease;
+}
+
+.file-upload-container .drop-zone {
+	cursor: pointer;
+}
+
+.file-upload-container .drop-zone:hover {
+	border-color: #3b82f6;
+	background-color: #f8fafc;
+}

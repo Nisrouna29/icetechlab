@@ -1,0 +1,88 @@
+<div class="min-h-screen w-full bg-gray-50">
+	<!-- Header -->
+	<app-header></app-header>
+
+	<!-- Main Content -->
+	<div class="flex-1 flex flex-col w-full">
+		<!-- Breadcrumb Navigation -->
+		<div class="bg-white border-b border-gray-200 px-4 py-3">
+			<app-breadcrumb
+				[viewMode]="viewMode()"
+				(onNavigateToRoot)="navigateToRoot()"
+				(onNavigateToPath)="navigateToPath($event)"
+				(onNavigateBack)="navigateBack()"
+				(onNavigateForward)="navigateForward()"
+				(onRefresh)="refresh()"
+				(onToggleViewMode)="toggleViewMode()"
+				(onSetViewMode)="setViewMode($event)">
+			</app-breadcrumb>
+		</div>
+
+		<!-- Toolbar -->
+		<div class="bg-white border-b border-gray-200 px-4 py-2">
+			<app-toolbar
+				[selectedCount]="selectedItems().size"
+				[viewMode]="viewMode()"
+				(onNewFolder)="showNewFolderModal()"
+				(onDelete)="modalService.showDeleteModal()"
+				(onToggleViewMode)="toggleViewMode()"
+				(onSetViewMode)="setViewMode($event)">
+			</app-toolbar>
+		</div>
+
+		<!-- File Explorer -->
+		<section id="file-explorer" class="flex-1 overflow-auto bg-gray-50 w-full">
+			<div class="p-4 sm:p-6">
+				<!-- File Upload Component -->
+				<app-file-upload
+					(onUploadComplete)="onUploadComplete()"
+					(onUploadError)="onUploadError()">
+				</app-file-upload>
+
+				<!-- Files Section -->
+				<div>
+					<h2
+						class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+						<i
+							class="fa-solid fa-folder mr-1 sm:mr-2 text-blue-500 text-sm sm:text-base"></i>
+						{{ getCurrentFolderName() }}
+					</h2>
+
+					<!-- Loading State -->
+					@if (isLoading()) {
+					<div class="flex flex-col items-center justify-center py-12">
+						<div
+							class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+						<p class="text-gray-500 text-sm">Loading files...</p>
+					</div>
+					} @else {
+					<!-- Files Grid -->
+					<div [class]="getViewClasses()">
+						@for (file of files(); track file.id) {
+						<app-file-item
+							[file]="file"
+							[viewMode]="viewMode()"
+							[isSelected]="isSelected(file.id)"
+							(onClick)="onFileClick($event)"
+							(onToggleSelection)="toggleSelection($event)"
+							(onSelectRange)="selectRange($event)"
+							(onAction)="onFileAction($event.action, $event.file)"
+							(onContextMenu)="fileManagerService.showContextMenu($event.file, $event.x, $event.y)">
+						</app-file-item>
+						}
+					</div>
+					}
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<!-- Modals -->
+	<app-new-folder-modal></app-new-folder-modal>
+	<app-rename-modal></app-rename-modal>
+	<app-move-modal></app-move-modal>
+	<app-delete-modal></app-delete-modal>
+
+	<!-- Snackbar -->
+	<app-snackbar></app-snackbar>
+</div>

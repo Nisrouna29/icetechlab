@@ -1,0 +1,39 @@
+<div
+	class="fixed inset-0 z-50 flex items-center justify-center"
+	style="background-color: rgba(107, 114, 128, 0.6)"
+	[class.hidden]="!isVisible()">
+	<div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+		<div class="flex items-center justify-between p-6 border-b border-gray-200">
+			<h2 class="text-xl font-semibold text-gray-800">Confirm Delete</h2>
+			<button class="text-gray-400 hover:text-gray-600" (click)="close()">
+				<i class="fa-solid fa-times text-xl"></i>
+			</button>
+		</div>
+
+		<div class="p-6">
+			<div class="flex items-center mb-4">
+				<div
+					class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+					<i class="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
+				</div>
+				<div>
+					<h3 class="font-semibold text-gray-800">Delete Items</h3>
+					<p class="text-sm text-gray-600">{{ deleteMessage() }}</p>
+				</div>
+			</div>
+
+			<div class="flex justify-end space-x-3">
+				<button
+					class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+					(click)="close()">
+					Cancel
+				</button>
+				<button
+					class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+					(click)="confirmDelete()">
+					Delete
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

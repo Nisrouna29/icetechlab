@@ -1,0 +1,19 @@
+.snackbar-enter {
+	transform: translateX(100%);
+	opacity: 0;
+}
+
+.snackbar-enter-active {
+	transform: translateX(0);
+	opacity: 1;
+}
+
+.snackbar-exit {
+	transform: translateX(0);
+	opacity: 1;
+}
+
+.snackbar-exit-active {
+	transform: translateX(100%);
+	opacity: 0;
+}

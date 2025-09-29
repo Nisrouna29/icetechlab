@@ -1,0 +1,68 @@
+// Toolbar component styles
+.toolbar {
+	.view-toggle {
+		.view-button {
+			transition: all 0.2s ease;
+
+			&.active {
+				color: #2563eb;
+				background-color: #eff6ff;
+			}
+
+			&:not(.active):hover {
+				background-color: #f3f4f6;
+			}
+		}
+	}
+
+	.action-button {
+		transition: all 0.2s ease;
+
+		&:hover {
+			transform: translateY(-1px);
+		}
+
+		&.danger:hover {
+			background-color: #fef2f2;
+			color: #dc2626;
+		}
+
+		&.primary:hover {
+			background-color: #eff6ff;
+			color: #2563eb;
+		}
+
+		&.success:hover {
+			background-color: #f0fdf4;
+			color: #16a34a;
+		}
+	}
+
+	.divider {
+		background-color: #d1d5db;
+	}
+
+	.sort-select {
+		transition: border-color 0.2s ease;
+
+		&:focus {
+			border-color: #2563eb;
+			box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+		}
+	}
+
+	.bulk-actions {
+		animation: slideIn 0.3s ease-out;
+	}
+}
+
+@keyframes slideIn {
+	from {
+		opacity: 0;
+		transform: translateX(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}

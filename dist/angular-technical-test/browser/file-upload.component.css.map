@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/components/file-upload/file-upload.component.scss", "src/app/components/file-upload/file-upload.component.scss"],
+  "sourcesContent": [".file-upload-container {\n\ttransition: all 0.3s ease;\n}\n\n.file-upload-container .drop-zone {\n\tcursor: pointer;\n}\n\n.file-upload-container .drop-zone:hover {\n\tborder-color: #3b82f6;\n\tbackground-color: #f8fafc;\n}\n", ".file-upload-container {\n  transition: all 0.3s ease;\n}\n\n.file-upload-container .drop-zone {\n  cursor: pointer;\n}\n\n.file-upload-container .drop-zone:hover {\n  border-color: #3b82f6;\n  background-color: #f8fafc;\n}\n/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJmaWxlOi8vL1VzZXJzL2docmliaS9EZXNrdG9wL2ljdGVjaGxhYi9mcm9udC10ZWNobmljYWwtdGVzdC9zcmMvYXBwL2NvbXBvbmVudHMvZmlsZS11cGxvYWQvZmlsZS11cGxvYWQuY29tcG9uZW50LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7RUFDQzs7O0FBR0Q7RUFDQzs7O0FBR0Q7RUFDQztFQUNBIiwic291cmNlc0NvbnRlbnQiOlsiLmZpbGUtdXBsb2FkLWNvbnRhaW5lciB7XG5cdHRyYW5zaXRpb246IGFsbCAwLjNzIGVhc2U7XG59XG5cbi5maWxlLXVwbG9hZC1jb250YWluZXIgLmRyb3Atem9uZSB7XG5cdGN1cnNvcjogcG9pbnRlcjtcbn1cblxuLmZpbGUtdXBsb2FkLWNvbnRhaW5lciAuZHJvcC16b25lOmhvdmVyIHtcblx0Ym9yZGVyLWNvbG9yOiAjM2I4MmY2O1xuXHRiYWNrZ3JvdW5kLWNvbG9yOiAjZjhmYWZjO1xufVxuIl19 */"],
+  "mappings": ";AAAA,CAAA;AACC,cAAA,IAAA,KAAA;ACCD;ADEA,CAJA,sBAIA,CAAA;AACC,UAAA;ACCD;ADEA,CARA,sBAQA,CAJA,SAIA;AACC,gBAAA;AACA,oBAAA;ACCD;",
+  "names": []
+}

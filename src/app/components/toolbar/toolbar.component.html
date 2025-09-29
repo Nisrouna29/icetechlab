@@ -1,0 +1,35 @@
+<section
+	id="quick-actions"
+	class="bg-white border-b border-gray-200 px-4 sm:px-6 py-2 sm:py-3">
+	<div
+		class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+		<div class="flex items-center space-x-2 sm:space-x-3 flex-wrap">
+			<button
+				class="px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center space-x-1 sm:space-x-2 transition-colors text-sm"
+				(click)="showNewFolderModal()">
+				<span class="font-medium">New Folder</span>
+			</button>
+		</div>
+
+		<div
+			class="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-between sm:justify-end">
+			@if (selectedCount > 0) {
+			<span class="text-xs sm:text-sm text-gray-500"
+				>{{ selectedCount }} selected</span
+			>
+			} @else {
+			<span class="text-xs sm:text-sm text-gray-500"
+				>{{ itemCount() }} items</span
+			>
+			}
+			<div class="flex items-center space-x-1 sm:space-x-2">
+				<button
+					class="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
+					title="Refresh"
+					(click)="refresh()">
+					<i class="fa-solid fa-refresh text-sm"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+</section>

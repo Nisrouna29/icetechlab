@@ -1,0 +1,54 @@
+<section
+	id="breadcrumb-section"
+	class="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4">
+	<div
+		class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+		<div class="flex items-center space-x-2 overflow-x-auto">
+			<nav
+				class="flex items-center space-x-2 text-xs sm:text-sm whitespace-nowrap">
+				@for (item of breadcrumbPath(); track $index; let isLast = $last) { @if
+				($index === 0) {
+				<span
+					class="text-gray-500 hover:text-gray-700 cursor-pointer"
+					(click)="navigateToRoot()"
+					[class.text-gray-900]="isLast"
+					[class.font-medium]="isLast"
+					>{{ item.name }}</span
+				>
+				} @else {
+				<span
+					class="text-gray-500 hover:text-gray-700 cursor-pointer"
+					(click)="navigateToPath(item.path)"
+					[class.text-gray-900]="isLast"
+					[class.font-medium]="isLast"
+					>{{ item.name }}</span
+				>
+				} @if (!isLast) {
+				<i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
+				} }
+			</nav>
+		</div>
+
+		<div
+			class="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-between sm:justify-end">
+			<div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+				<button
+					class="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded-md transition-colors"
+					[class.bg-white]="viewMode === 'grid'"
+					[class.text-gray-900]="viewMode === 'grid'"
+					(click)="setViewMode('grid')"
+					title="Grid View">
+					<i class="fa-solid fa-th-large text-sm"></i>
+				</button>
+				<button
+					class="p-1.5 sm:p-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded-md transition-colors"
+					[class.bg-white]="viewMode === 'list'"
+					[class.text-gray-900]="viewMode === 'list'"
+					(click)="setViewMode('list')"
+					title="List View">
+					<i class="fa-solid fa-list text-sm"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+</section>

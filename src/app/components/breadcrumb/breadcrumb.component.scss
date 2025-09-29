@@ -1,0 +1,23 @@
+// Breadcrumb component styles
+.breadcrumb-nav {
+	.breadcrumb-item {
+		transition: color 0.2s ease;
+
+		&:hover {
+			color: #1d4ed8;
+		}
+	}
+
+	.navigation-button {
+		transition: all 0.2s ease;
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		&:not(:disabled):hover {
+			background-color: #f3f4f6;
+		}
+	}
+}

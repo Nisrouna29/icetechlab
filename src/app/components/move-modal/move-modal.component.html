@@ -1,0 +1,65 @@
+<div
+	id="move-modal"
+	class="fixed inset-0 z-50 flex items-center justify-center"
+	style="background-color: rgba(107, 114, 128, 0.6)"
+	[class.hidden]="!isVisible()">
+	<div class="bg-white rounded-lg p-6 w-full max-w-lg mx-4">
+		<h3 class="text-lg font-semibold text-gray-900 mb-4">Move to Folder</h3>
+		<div class="border border-gray-300 rounded-lg max-h-64 overflow-y-auto">
+			<div
+				class="p-3 hover:bg-gray-100 cursor-pointer flex items-center"
+				[class.bg-blue-50]="selectedDestination() === null"
+				(click)="selectDestination(null)">
+				<i class="fa-solid fa-home text-gray-500 mr-3"></i>
+				<span>Root</span>
+			</div>
+			@for (node of folderTree(); track node.folder.id) {
+			<ng-container
+				[ngTemplateOutlet]="folderNode"
+				[ngTemplateOutletContext]="{ node: node }"></ng-container>
+			}
+		</div>
+
+		<ng-template #folderNode let-node="node">
+			<div
+				class="p-3 hover:bg-gray-100 cursor-pointer flex items-center"
+				[class.bg-blue-50]="selectedDestination() === node.folder.id"
+				[style.padding-left]="(node.level * 20 + 12) + 'px'"
+				(click)="selectDestination(node.folder.id)">
+				@if (hasChildren(node)) {
+				<button
+					class="mr-2 text-gray-400 hover:text-gray-600 w-4 h-4 flex items-center justify-center"
+					(click)="toggleFolder(node); $event.stopPropagation()">
+					<i
+						class="fa-solid text-xs"
+						[class.fa-chevron-right]="!isExpanded(node.folder.id)"
+						[class.fa-chevron-down]="isExpanded(node.folder.id)"></i>
+				</button>
+				} @else {
+				<div class="w-4 mr-2"></div>
+				}
+				<i
+					class="fa-solid {{ node.folder.icon }} {{ node.folder.color }} mr-3"></i>
+				<span>{{ node.folder.name }}</span>
+			</div>
+			@if (isExpanded(node.folder.id)) { @for (child of node.children; track
+			child.folder.id) {
+			<ng-container
+				[ngTemplateOutlet]="folderNode"
+				[ngTemplateOutletContext]="{ node: child }"></ng-container>
+			} }
+		</ng-template>
+		<div class="flex justify-end space-x-3 mt-4">
+			<button
+				class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
+				(click)="close()">
+				Cancel
+			</button>
+			<button
+				class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
+				(click)="confirmMove()">
+				Move
+			</button>
+		</div>
+	</div>
+</div>

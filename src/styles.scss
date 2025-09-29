@@ -1,0 +1,74 @@
+@use 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+::-webkit-scrollbar {
+	display: none;
+}
+
+html,
+body {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+body {
+	font-family: 'Inter', sans-serif;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	overflow-x: hidden;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.drag-over {
+	background-color: rgba(59, 130, 246, 0.1);
+	border: 2px dashed #3b82f6;
+}
+
+.upload-progress {
+	animation: progress 2s ease-in-out;
+}
+
+@keyframes progress {
+	0% {
+		width: 0%;
+	}
+	100% {
+		width: 100%;
+	}
+}
+
+.context-menu {
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.file-icon {
+	transition: transform 0.2s ease;
+}
+
+.file-icon:hover {
+	transform: scale(1.05);
+}
+
+.highlighted-section {
+	outline: 2px solid #3f20fb;
+	background-color: rgba(63, 32, 251, 0.1);
+}
+
+.edit-button {
+	position: absolute;
+	z-index: 1000;
+}
+
+/* Ensure full width on all screen sizes */
+* {
+	box-sizing: border-box;
+}
+
+#root,
+app-root {
+	width: 100%;
+	min-height: 100vh;
+}

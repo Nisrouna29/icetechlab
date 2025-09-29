@@ -1,0 +1,94 @@
+// File Item component styles
+.file-item {
+	transition: all 0.2s ease;
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+
+	&.selected {
+		transform: scale(1.02);
+		box-shadow: 0 0 0 2px #3b82f6;
+	}
+
+	.file-content {
+		transition: all 0.2s ease;
+
+		&:hover {
+			border-color: #3b82f6;
+		}
+	}
+
+	.file-icon {
+		transition: transform 0.2s ease;
+
+		&:hover {
+			transform: scale(1.1);
+		}
+	}
+
+	.file-thumbnail {
+		transition: all 0.2s ease;
+
+		&:hover {
+			transform: scale(1.05);
+		}
+	}
+
+	.hover-actions {
+		transition: opacity 0.2s ease;
+
+		.context-menu-btn {
+			transition: all 0.2s ease;
+
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.05);
+				transform: scale(1.1);
+			}
+		}
+	}
+
+	.checkbox {
+		transition: all 0.2s ease;
+
+		&:checked {
+			opacity: 1;
+		}
+	}
+
+	// Folder specific styles
+	&.folder-item {
+		.file-content {
+			&:hover {
+				border-color: #f59e0b;
+			}
+		}
+	}
+
+	// File specific styles
+	&:not(.folder-item) {
+		.file-content {
+			&:hover {
+				border-color: #10b981;
+			}
+		}
+	}
+}
+
+// Animation for file selection
+@keyframes selectPulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+	}
+	70% {
+		box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+	}
+	100% {
+		box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+	}
+}
+
+.file-item.selected {
+	animation: selectPulse 0.6s ease-out;
+}
