@@ -6,6 +6,7 @@ import {
 	Output,
 	EventEmitter,
 	OnInit,
+	effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -57,18 +58,50 @@ export class FileExplorerComponent implements OnInit {
 
 	// Signals
 	viewMode = signal<'grid' | 'list'>('grid');
+	private _showErrorModal = signal(false);
+	private _errorHandled = signal(false);
+	private _missingFolderName = signal<string>('');
 
 	// Computed signals
 	files = computed(() => this.fileManagerService.files());
 	isLoading = computed(() => this.fileManagerService.isLoading());
 	selectedItems = computed(() => this.fileManagerService.selectedItems());
 	currentPath = computed(() => this.fileManagerService.currentPath());
+	error = computed(() => this.fileManagerService.error());
+	showErrorModal = computed(() => this._showErrorModal());
+	missingFolderName = computed(() => this._missingFolderName());
+
+	constructor() {
+		// Handle errors - if folder doesn't exist, navigate to parent and show modal
+		effect(() => {
+			const error = this.fileManagerService.error();
+			if (error && error.includes('Failed to load folder contents') && !this._errorHandled()) {
+				this._errorHandled.set(true);
+				// Get the missing folder name from the service
+				const missingFolder = this.fileManagerService.missingFolderName();
+				this._missingFolderName.set(missingFolder || 'Unknown');
+				
+				// Get the last valid path and navigate to it
+				const lastValid = this.fileManagerService.getLastValidPath();
+				const targetPath = lastValid.path.length === 0 ? [''] : lastValid.path;
+				
+				this.router.navigate(['/', ...targetPath]).then(() => {
+					// Show modal after navigation
+					setTimeout(() => {
+						this.displayErrorModal();
+					}, 1000);
+				});
+			}
+		});
+	}
 
 	ngOnInit() {
 		// Handle route changes
 		this.route.url.subscribe(urlSegments => {
 			// Clear files immediately to prevent showing previous content
 			this.fileManagerService.clearFiles();
+			// Reset error handling when navigating to a new route
+			this._errorHandled.set(false);
 
 			if (urlSegments.length === 0) {
 				this.loadFolderContent(null, []);
@@ -86,6 +119,18 @@ export class FileExplorerComponent implements OnInit {
 
 	private loadFolderByPath(folderPath: string[]) {
 		this.fileManagerService.navigateToPath(folderPath);
+	}
+
+
+	private displayErrorModal() {
+		this._showErrorModal.set(true);
+	}
+
+	closeErrorModal() {
+		this._showErrorModal.set(false);
+		this._errorHandled.set(false);
+		this._missingFolderName.set('');
+		this.fileManagerService.clearError();
 	}
 
 	getViewClasses(): string {
@@ -184,12 +229,12 @@ export class FileExplorerComponent implements OnInit {
 
 	// Navigation methods
 	navigateToRoot() {
-		this.router.navigate(['/home']);
+		this.router.navigate(['']);
 	}
 
 	navigateToPath(path: string[]) {
 		if (path.length === 0) {
-			this.router.navigate(['/home']);
+			this.router.navigate(['']);
 		} else {
 			// For nested paths, navigate to the full path
 			this.router.navigate(['/', ...path]);
@@ -198,10 +243,24 @@ export class FileExplorerComponent implements OnInit {
 
 	navigateBack() {
 		this.fileManagerService.navigateBack();
+		// Update URL after navigation
+		const currentPath = this.fileManagerService.currentPath();
+		if (currentPath.length === 0) {
+			this.router.navigate(['']);
+		} else {
+			this.router.navigate(['/', ...currentPath]);
+		}
 	}
 
 	navigateForward() {
 		this.fileManagerService.navigateForward();
+		// Update URL after navigation
+		const currentPath = this.fileManagerService.currentPath();
+		if (currentPath.length === 0) {
+			this.router.navigate(['']);
+		} else {
+			this.router.navigate(['/', ...currentPath]);
+		}
 	}
 
 	refresh() {

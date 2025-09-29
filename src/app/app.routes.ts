@@ -3,11 +3,6 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
 	{
 		path: '',
-		redirectTo: '/home',
-		pathMatch: 'full',
-	},
-	{
-		path: 'home',
 		loadComponent: () =>
 			import('./components/file-explorer/file-explorer.component').then(
 				m => m.FileExplorerComponent

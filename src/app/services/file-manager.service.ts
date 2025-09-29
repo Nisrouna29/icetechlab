@@ -48,11 +48,14 @@ export class FileManagerService {
 	private _contextMenuItem = signal<FileItem | null>(null);
 	private _currentFolderId = signal<string | null>(null);
 	private _error = signal<string | null>(null);
+	private _missingFolderName = signal<string | null>(null);
 	private _itemToRename = signal<FileItem | null>(null);
 	private _itemToMove = signal<FileItem | null>(null);
 	private _itemsToDelete = signal<string[]>([]);
 	private _allFolders = signal<FileItem[]>([]);
 	private _folderItemCounts = signal<Map<string, number>>(new Map());
+	private _lastValidPath: string[] = [];
+	private _lastValidFolderId: string | null = null;
 
 	// Computed signals
 	files = computed(() => this._files());
@@ -62,6 +65,7 @@ export class FileManagerService {
 	isLoading = computed(() => this._isLoading());
 	currentFolderId = computed(() => this._currentFolderId());
 	error = computed(() => this._error());
+	missingFolderName = computed(() => this._missingFolderName());
 	itemToRename = computed(() => this._itemToRename());
 	itemToMove = computed(() => this._itemToMove());
 	itemsToDelete = computed(() => this._itemsToDelete());
@@ -83,24 +87,20 @@ export class FileManagerService {
 	// Breadcrumb computed
 	breadcrumbPath = computed(() => {
 		const path = this._currentPath();
+		const missingFolder = this._missingFolderName();
 
-		// If we're at root (empty path), just show "Root"
+		// If we're at root (empty path), show "Home"
 		if (path.length === 0) {
-			return [{ name: 'Root', path: [] }];
+			return [{ name: 'Home', path: [] }];
 		}
 
-		// If we're at home (path is just ['home']), just show "Root"
-		if (path.length === 1 && path[0] === 'home') {
-			return [{ name: 'Root', path: [] }];
-		}
-
-		// Always start with Root
+		// Always start with Home
 		const breadcrumb: Array<{ name: string; path: string[] }> = [
-			{ name: 'Root', path: [] },
+			{ name: 'Home', path: [] },
 		];
 
-		// Add each folder in the path, filtering out 'home'
-		const filteredPath = path.filter(segment => segment !== 'home');
+		// Add each folder in the path, filtering out missing folder
+		const filteredPath = path.filter(segment => segment !== missingFolder);
 		filteredPath.forEach((segment, index) => {
 			breadcrumb.push({
 				name: segment,
@@ -375,8 +375,17 @@ export class FileManagerService {
 			});
 		} else {
 			console.error('Folder not found:', targetFolderName);
-			// If folder not found, just load the current folder contents
+			// Store the missing folder name
+			this._missingFolderName.set(targetFolderName);
+			// Store the last valid path and folder ID for navigation
+			this._lastValidPath = [...currentPath];
+			this._lastValidFolderId = currentFolderId;
+			// If folder not found, load the current folder contents first, then set error
 			this.loadFolderContents(currentFolderId);
+			// Set error after a short delay to ensure it's not cleared by loadFolderContents
+			setTimeout(() => {
+				this._error.set(`Failed to load folder contents`);
+			}, 100);
 		}
 	}
 
@@ -1008,6 +1017,7 @@ export class FileManagerService {
 	 */
 	clearError(): void {
 		this._error.set(null);
+		this._missingFolderName.set(null);
 	}
 
 	/**
@@ -1057,5 +1067,15 @@ export class FileManagerService {
 	 */
 	clearItemsToDelete(): void {
 		this._itemsToDelete.set([]);
+	}
+
+	/**
+	 * Get the last valid path when a folder doesn't exist
+	 */
+	getLastValidPath(): { path: string[]; folderId: string | null } {
+		return {
+			path: this._lastValidPath,
+			folderId: this._lastValidFolderId
+		};
 	}
 }
