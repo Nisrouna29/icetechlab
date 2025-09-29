@@ -199,25 +199,8 @@ export class FileExplorerComponent implements OnInit {
 			// Navigate directly using the folder ID for faster loading
 			this.fileManagerService.navigateToPath(newPath, file.id);
 			this.router.navigate(['/', ...newPath]);
-		} else {
-			// Handle file click - download the file
-			this.fileManagerService.downloadFile(file.id).subscribe({
-				next: blob => {
-					const url = window.URL.createObjectURL(blob);
-					const a = document.createElement('a');
-					a.href = url;
-					a.download = file.name;
-					a.click();
-					window.URL.revokeObjectURL(url);
-				},
-				error: error => {
-					console.error('Error downloading file:', error);
-					this.snackbarService.error(
-						`Failed to download "${file.name}": ${error.message || 'Unknown error'}`
-					);
-				},
-			});
 		}
+		// For files, do nothing when clicked
 	}
 
 	toggleSelection(fileId: string) {
