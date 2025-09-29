@@ -65,13 +65,6 @@ export class MoveModalComponent {
 		// Include all ancestors of valid folders to maintain tree structure
 		const foldersWithAncestors = this.includeAncestors(validFolders, allFolders);
 
-		// Debug: Check if prestassart and images are in the tree
-		const prestassart = foldersWithAncestors.find(f => f.name === 'prestassart');
-		const images = foldersWithAncestors.find(f => f.name === 'images');
-		if (prestassart && images) {
-			console.log('prestassart:', prestassart);
-			console.log('images:', images);
-		}
 
 		return this.buildFolderTree(foldersWithAncestors);
 	});
@@ -106,10 +99,19 @@ export class MoveModalComponent {
 			}
 		});
 
-		// Debug: Log the final tree structure
-		console.log('Final tree structure:', rootNodes.map(node => this.logTreeStructure(node, 0)));
-		
+		// Recursively set levels to ensure correct indentation
+		this.setLevelsRecursively(rootNodes, 0);
+
 		return rootNodes;
+	}
+
+	private setLevelsRecursively(nodes: FolderTreeNode[], level: number): void {
+		nodes.forEach(node => {
+			node.level = level;
+			if (node.children.length > 0) {
+				this.setLevelsRecursively(node.children, level + 1);
+			}
+		});
 	}
 
 	private includeAncestors(validFolders: FileItem[], allFolders: FileItem[]): FileItem[] {
@@ -134,15 +136,6 @@ export class MoveModalComponent {
 		
 		// Return all folders (valid + ancestors) in the same order as allFolders
 		return allFolders.filter(folder => result.has(folder.id));
-	}
-
-	private logTreeStructure(node: FolderTreeNode, level: number): any {
-		const indent = '  '.repeat(level);
-		return {
-			name: node.folder.name,
-			level: node.level,
-			children: node.children.map(child => this.logTreeStructure(child, level + 1))
-		};
 	}
 
 	private isDescendant(
