@@ -34,30 +34,15 @@ export class DeleteModalComponent {
 		const item = this.itemToDelete();
 		if (!item) return;
 
-		this.fileManagerService.deleteItems([item.id]).subscribe({
+		this.fileManagerService.deleteItem(item).subscribe({
 			next: () => {
-				this.snackbarService.success(`${item.type === 'folder' ? 'Folder' : 'File'} deleted successfully`);
+				// Success handling is done in the file manager service
 				this.close();
 			},
 			error: error => {
-				// Show specific error messages based on the error
-				let errorMessage = `Failed to delete ${item.type}`;
-
-				if (error.message) {
-					if (
-						error.message.includes('Cannot delete folder that contains items')
-					) {
-						errorMessage =
-							'Cannot delete folder that contains items. Please empty the folder first.';
-					} else if (error.message.includes('NOT_FOUND')) {
-						errorMessage =
-							'Item not found. It may have been already deleted.';
-					} else {
-						errorMessage = error.message;
-					}
-				}
-
-				this.snackbarService.error(errorMessage);
+				// Error handling is done in the file manager service
+				// Just close the modal on error
+				this.close();
 			},
 		});
 	}

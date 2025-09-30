@@ -488,6 +488,26 @@ export class FileManagerService {
 					this.refreshFolderCounts();
 					// Refresh all folders list for move modal
 					this.refreshAllFolders().subscribe();
+					// Show success snackbar
+					this.snackbarService.success(`Folder "${name}" created successfully`);
+				}),
+				catchError(error => {
+					// Show specific error messages based on the error
+					let errorMessage = 'Failed to create folder';
+
+					if (error.message) {
+						if (
+							error.message.includes('already exists') ||
+							error.message.includes('duplicate')
+						) {
+							errorMessage = `A folder with the name "${name}" already exists`;
+						} else {
+							errorMessage = error.message;
+						}
+					}
+
+					this.snackbarService.error(errorMessage);
+					throw error;
 				})
 			);
 	}
@@ -908,39 +928,40 @@ export class FileManagerService {
 		);
 	}
 
-	deleteItems(itemIds: string[]): Observable<void> {
-		// Delete items one by one
-		const deleteObservables = itemIds.map(id => this.apiService.deleteItem(id));
+	deleteItem(item: FileItem): Observable<void> {
+		return this.apiService.deleteItem(item.id).pipe(
+			tap(() => {
+				// Reload current folder to reflect changes
+				this.loadFolderContents(this._currentFolderId());
+				// Refresh folder counts to update all folder sizes
+				this.refreshFolderCounts();
+				// Refresh all folders list for move modal
+				this.refreshAllFolders().subscribe();
+				// Show success snackbar
+				this.snackbarService.success(`${item.type === 'folder' ? 'Folder' : 'File'} deleted successfully`);
+			}),
+			catchError(error => {
+				// Show specific error messages based on the error
+				let errorMessage = `Failed to delete ${item.type}`;
 
-		return new Observable(observer => {
-			let completed = 0;
-			let hasError = false;
+				if (error.message) {
+					if (
+						error.message.includes('Cannot delete folder that contains items')
+					) {
+						errorMessage =
+							'Cannot delete folder that contains items. Please empty the folder first.';
+					} else if (error.message.includes('NOT_FOUND')) {
+						errorMessage =
+							'Item not found. It may have been already deleted.';
+					} else {
+						errorMessage = error.message;
+					}
+				}
 
-			deleteObservables.forEach(obs => {
-				obs.subscribe({
-					next: () => {
-						completed++;
-						if (completed === itemIds.length && !hasError) {
-							// Reload current folder to reflect changes
-							this.loadFolderContents(this._currentFolderId());
-							// Refresh folder counts to update all folder sizes
-							this.refreshFolderCounts();
-							// Refresh all folders list for move modal
-							this.refreshAllFolders().subscribe();
-							this.clearSelection();
-							observer.next();
-							observer.complete();
-						}
-					},
-					error: error => {
-						if (!hasError) {
-							hasError = true;
-							observer.error(error);
-						}
-					},
-				});
-			});
-		});
+				this.snackbarService.error(errorMessage);
+				throw error;
+			})
+		);
 	}
 
 	moveItem(itemId: string, newParentId: string | null): Observable<FileItem> {

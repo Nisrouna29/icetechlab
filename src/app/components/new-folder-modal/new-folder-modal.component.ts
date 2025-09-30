@@ -75,25 +75,13 @@ export class NewFolderModalComponent {
 
 		this.fileManagerService.createFolder(name).subscribe({
 			next: newFolder => {
-				this.snackbarService.success(`Folder "${name}" created successfully`);
+				// Success handling is done in the file manager service
 				this.close();
 			},
 			error: error => {
-				// Show specific error messages based on the error
-				let errorMessage = 'Failed to create folder';
-
-				if (error.message) {
-					if (
-						error.message.includes('already exists') ||
-						error.message.includes('duplicate')
-					) {
-						errorMessage = `A folder with the name "${name}" already exists`;
-					} else {
-						errorMessage = error.message;
-					}
-				}
-
-				this.snackbarService.error(errorMessage);
+				// Error handling is done in the file manager service
+				// Just close the modal on error
+				this.close();
 			},
 		});
 	}
