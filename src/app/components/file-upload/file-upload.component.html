@@ -58,7 +58,7 @@
 		<div class="bg-white rounded-lg p-4 border border-gray-200">
 			<div class="flex items-center justify-between mb-2">
 				<div class="flex items-center space-x-3">
-					<i [class]="getFileIcon(uploadingFile.file.name)" class="text-lg"></i>
+					<i [class]="getFileIcon(uploadingFile.file.name) + ' ' + getFileColor(uploadingFile.file.name)" class="text-lg"></i>
 					<div>
 						<p class="text-sm font-medium text-gray-900">
 							{{ uploadingFile.file.name }}

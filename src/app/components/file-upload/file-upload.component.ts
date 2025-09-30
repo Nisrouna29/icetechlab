@@ -554,35 +554,10 @@ export class FileUploadComponent {
 	}
 
 	getFileIcon(fileName: string): string {
-		const extension = fileName.split('.').pop()?.toLowerCase();
-		const iconMap: { [key: string]: string } = {
-			pdf: 'fa-solid fa-file-pdf text-red-500',
-			doc: 'fa-solid fa-file-word text-blue-500',
-			docx: 'fa-solid fa-file-word text-blue-500',
-			xls: 'fa-solid fa-file-excel text-green-500',
-			xlsx: 'fa-solid fa-file-excel text-green-500',
-			ppt: 'fa-solid fa-file-powerpoint text-orange-500',
-			pptx: 'fa-solid fa-file-powerpoint text-orange-500',
-			jpg: 'fa-solid fa-file-image text-green-500',
-			jpeg: 'fa-solid fa-file-image text-green-500',
-			png: 'fa-solid fa-file-image text-green-500',
-			gif: 'fa-solid fa-file-image text-green-500',
-			mp4: 'fa-solid fa-file-video text-purple-500',
-			avi: 'fa-solid fa-file-video text-purple-500',
-			mov: 'fa-solid fa-file-video text-purple-500',
-			mp3: 'fa-solid fa-file-audio text-pink-500',
-			wav: 'fa-solid fa-file-audio text-pink-500',
-			zip: 'fa-solid fa-file-zipper text-yellow-500',
-			rar: 'fa-solid fa-file-zipper text-yellow-500',
-			txt: 'fa-solid fa-file-lines text-gray-500',
-			md: 'fa-solid fa-file-lines text-gray-500',
-			json: 'fa-solid fa-file-code text-yellow-500',
-			xml: 'fa-solid fa-file-code text-orange-500',
-			html: 'fa-solid fa-file-code text-orange-500',
-			css: 'fa-solid fa-file-code text-blue-500',
-			js: 'fa-solid fa-file-code text-yellow-500',
-			ts: 'fa-solid fa-file-code text-blue-500',
-		};
-		return iconMap[extension || ''] || 'fa-solid fa-file text-gray-500';
+		return this.fileManagerService.getFileIcon(fileName);
+	}
+
+	getFileColor(fileName: string): string {
+		return this.fileManagerService.getFileColor(fileName);
 	}
 }
