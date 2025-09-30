@@ -266,9 +266,6 @@ export class FileExplorerComponent implements OnInit {
 		}
 	}
 
-	refresh() {
-		this.fileManagerService.refresh();
-	}
 
 	setViewMode(mode: 'grid' | 'list') {
 		this.viewMode.set(mode);

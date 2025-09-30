@@ -25,7 +25,6 @@ export class BreadcrumbComponent {
 	// Outputs
 	@Output() onNavigateToRoot = new EventEmitter<void>();
 	@Output() onNavigateToPath = new EventEmitter<string[]>();
-	@Output() onRefresh = new EventEmitter<void>();
 	@Output() onSetViewMode = new EventEmitter<'grid' | 'list'>();
 
 	// Computed signals
@@ -39,10 +38,6 @@ export class BreadcrumbComponent {
 
 	navigateToPath(path: string[]) {
 		this.onNavigateToPath.emit(path);
-	}
-
-	refresh() {
-		this.onRefresh.emit();
 	}
 
 
