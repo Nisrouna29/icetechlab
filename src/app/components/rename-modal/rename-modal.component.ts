@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { FileManagerService } from '../../services/file-manager.service';
 import { ModalService } from '../../services/modal.service';
 import { SnackbarService } from '../../services/snackbar.service';
+import { finalize } from 'rxjs';
 
 @Component({
 	selector: 'app-rename-modal',
@@ -79,15 +80,6 @@ export class RenameModalComponent {
 			return;
 		}
 
-		this.fileManagerService.renameItem(item.id, name).subscribe({
-			next: renamedItem => {
-				this.close();
-			},
-			error: error => {
-				// Error handling is done in the file manager service
-				// Just close the modal on error
-				this.close();
-			},
-		});
+		this.fileManagerService.renameItem(item.id, name).pipe(finalize(()=>{	this.close();})).subscribe();
 	}
 }
