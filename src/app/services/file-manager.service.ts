@@ -134,17 +134,6 @@ export class FileManagerService {
 	}
 
 	/**
-	 * Load root folder contents
-	 */
-	private loadRootFolder(): void {
-		this._currentFolderId.set(null);
-		this._currentPath.set([]);
-		this._navigationHistory.set([[]]);
-		this._historyIndex.set(0);
-		this.loadFolderContents(null);
-	}
-
-	/**
 	 * Convert API item to FileItem
 	 */
 	private convertApiItemToFileItem(apiItem: ApiItem): FileItem {
@@ -268,29 +257,7 @@ export class FileManagerService {
 		}
 	}
 
-	navigateBack() {
-		if (this.canGoBack()) {
-			const newIndex = this._historyIndex() - 1;
-			this._historyIndex.set(newIndex);
-			const path = this._navigationHistory()[newIndex];
-			this._currentPath.set(path);
-			// For simplicity, we'll reload the current folder
-			// In a real app, you'd want to store folder IDs in history
-			this.loadFolderContents(this._currentFolderId());
-		}
-	}
 
-	navigateForward() {
-		if (this.canGoForward()) {
-			const newIndex = this._historyIndex() + 1;
-			this._historyIndex.set(newIndex);
-			const path = this._navigationHistory()[newIndex];
-			this._currentPath.set(path);
-			// For simplicity, we'll reload the current folder
-			// In a real app, you'd want to store folder IDs in history
-			this.loadFolderContents(this._currentFolderId());
-		}
-	}
 
 	private addToHistory(path: string[]) {
 		const history = this._navigationHistory();
@@ -460,18 +427,6 @@ export class FileManagerService {
 
 	toggleSortOrder() {
 		this._sortOrder.set(this._sortOrder() === 'asc' ? 'desc' : 'asc');
-	}
-
-	// Context menu methods
-	showContextMenu(item: FileItem, x: number, y: number) {
-		this._contextMenuItem.set(item);
-		this._contextMenuPosition.set({ x, y });
-		this._contextMenuVisible.set(true);
-	}
-
-	hideContextMenu() {
-		this._contextMenuVisible.set(false);
-		this._contextMenuItem.set(null);
 	}
 
 	// File operations
