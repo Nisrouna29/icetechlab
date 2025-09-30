@@ -145,8 +145,8 @@ export class FileManagerService {
 				? 'Loading...'
 				: this.apiService.formatFileSize(apiItem.size || 0),
 			modified: new Date(apiItem.modification).toLocaleDateString(),
-			icon: this.apiService.getFileIcon(apiItem),
-			color: this.apiService.getFileColor(apiItem),
+			icon: this.getFileIcon(apiItem.name, apiItem.folder, apiItem.mimeType),
+			color: this.getFileColor(apiItem.name, apiItem.folder, apiItem.mimeType),
 			parentId: apiItem.parentId,
 			mimeType: apiItem.mimeType,
 			filePath: apiItem.filePath,
@@ -968,118 +968,140 @@ export class FileManagerService {
 		);
 	}
 
-	getFileIcon(fileName: string): string {
-		const extension = fileName.split('.').pop()?.toLowerCase();
-		const iconMap: { [key: string]: string } = {
-			// Documents
-			pdf: 'fa-solid fa-file-pdf',
-			doc: 'fa-solid fa-file-word',
-			docx: 'fa-solid fa-file-word',
-			xls: 'fa-solid fa-file-excel',
-			xlsx: 'fa-solid fa-file-excel',
-			ppt: 'fa-solid fa-file-powerpoint',
-			pptx: 'fa-solid fa-file-powerpoint',
-			
-			// Images
-			jpg: 'fa-solid fa-file-image',
-			jpeg: 'fa-solid fa-file-image',
-			png: 'fa-solid fa-file-image',
-			gif: 'fa-solid fa-file-image',
-			bmp: 'fa-solid fa-file-image',
-			svg: 'fa-solid fa-file-image',
-			webp: 'fa-solid fa-file-image',
-			
-			// Videos
-			mp4: 'fa-solid fa-file-video',
-			avi: 'fa-solid fa-file-video',
-			mov: 'fa-solid fa-file-video',
-			wmv: 'fa-solid fa-file-video',
-			flv: 'fa-solid fa-file-video',
-			webm: 'fa-solid fa-file-video',
-			mkv: 'fa-solid fa-file-video',
-			
-			// Audio
-			mp3: 'fa-solid fa-file-audio',
-			wav: 'fa-solid fa-file-audio',
-			flac: 'fa-solid fa-file-audio',
-			aac: 'fa-solid fa-file-audio',
-			ogg: 'fa-solid fa-file-audio',
-			
-			// Archives
-			zip: 'fa-solid fa-file-zipper',
-			rar: 'fa-solid fa-file-zipper',
-			'7z': 'fa-solid fa-file-zipper',
-			tar: 'fa-solid fa-file-zipper',
-			gz: 'fa-solid fa-file-zipper',
-			
-			// Text/Code files
-			txt: 'fa-solid fa-file-lines',
-			md: 'fa-solid fa-file-lines',
-			json: 'fa-solid fa-file-code',
-			xml: 'fa-solid fa-file-code',
-			html: 'fa-solid fa-file-code',
-			css: 'fa-solid fa-file-code',
-			js: 'fa-solid fa-file-code',
-			ts: 'fa-solid fa-file-code',
-		};
-		return iconMap[extension || ''] || 'fa-solid fa-file';
+	getFileIcon(fileName: string, isFolder: boolean = false, mimeType?: string): string {
+		if (isFolder) {
+			return 'fa-solid fa-folder';
+		}
+
+		const fileNameLower = fileName.toLowerCase();
+
+		// Image files
+		if (
+			mimeType?.startsWith('image/') ||
+			/\.(jpg|jpeg|png|gif|bmp|svg|webp)$/.test(fileNameLower)
+		) {
+			return 'fa-solid fa-file-image';
+		}
+
+		// Video files
+		if (
+			mimeType?.startsWith('video/') ||
+			/\.(mp4|avi|mov|wmv|flv|webm|mkv)$/.test(fileNameLower)
+		) {
+			return 'fa-solid fa-file-video';
+		}
+
+		// Audio files
+		if (
+			mimeType?.startsWith('audio/') ||
+			/\.(mp3|wav|flac|aac|ogg)$/.test(fileNameLower)
+		) {
+			return 'fa-solid fa-file-audio';
+		}
+
+		// Document files
+		if (mimeType === 'application/pdf' || fileNameLower.endsWith('.pdf')) {
+			return 'fa-solid fa-file-pdf';
+		}
+
+		if (
+			mimeType?.includes('wordprocessingml') ||
+			/\.(doc|docx)$/.test(fileNameLower)
+		) {
+			return 'fa-solid fa-file-word';
+		}
+
+		if (mimeType?.includes('spreadsheetml') || /\.(xls|xlsx)$/.test(fileNameLower)) {
+			return 'fa-solid fa-file-excel';
+		}
+
+		if (mimeType?.includes('presentationml') || /\.(ppt|pptx)$/.test(fileNameLower)) {
+			return 'fa-solid fa-file-powerpoint';
+		}
+
+		// Archive files
+		if (/\.(zip|rar|7z|tar|gz)$/.test(fileNameLower)) {
+			return 'fa-solid fa-file-zipper';
+		}
+
+		// Text files
+		if (
+			mimeType?.startsWith('text/') ||
+			/\.(txt|md|json|xml|html|css|js|ts)$/.test(fileNameLower)
+		) {
+			return 'fa-solid fa-file-lines';
+		}
+
+		// Default file icon
+		return 'fa-solid fa-file';
 	}
 
-	getFileColor(fileName: string): string {
-		const extension = fileName.split('.').pop()?.toLowerCase();
-		const colorMap: { [key: string]: string } = {
-			// Documents
-			pdf: 'text-red-500',
-			doc: 'text-blue-500',
-			docx: 'text-blue-500',
-			xls: 'text-green-500',
-			xlsx: 'text-green-500',
-			ppt: 'text-orange-500',
-			pptx: 'text-orange-500',
-			
-			// Images
-			jpg: 'text-green-500',
-			jpeg: 'text-green-500',
-			png: 'text-green-500',
-			gif: 'text-green-500',
-			bmp: 'text-green-500',
-			svg: 'text-green-500',
-			webp: 'text-green-500',
-			
-			// Videos
-			mp4: 'text-purple-500',
-			avi: 'text-purple-500',
-			mov: 'text-purple-500',
-			wmv: 'text-purple-500',
-			flv: 'text-purple-500',
-			webm: 'text-purple-500',
-			mkv: 'text-purple-500',
-			
-			// Audio
-			mp3: 'text-pink-500',
-			wav: 'text-pink-500',
-			flac: 'text-pink-500',
-			aac: 'text-pink-500',
-			ogg: 'text-pink-500',
-			
-			// Archives
-			zip: 'text-yellow-500',
-			rar: 'text-yellow-500',
-			'7z': 'text-yellow-500',
-			tar: 'text-yellow-500',
-			gz: 'text-yellow-500',
-			
-			// Text/Code files
-			txt: 'text-gray-500',
-			md: 'text-gray-500',
-			json: 'text-yellow-500',
-			xml: 'text-orange-500',
-			html: 'text-orange-500',
-			css: 'text-blue-500',
-			js: 'text-yellow-500',
-			ts: 'text-blue-500',
-		};
-		return colorMap[extension || ''] || 'text-gray-500';
+	getFileColor(fileName: string, isFolder: boolean = false, mimeType?: string): string {
+		if (isFolder) {
+			return 'text-yellow-500';
+		}
+
+		const fileNameLower = fileName.toLowerCase();
+
+		// Image files
+		if (
+			mimeType?.startsWith('image/') ||
+			/\.(jpg|jpeg|png|gif|bmp|svg|webp)$/.test(fileNameLower)
+		) {
+			return 'text-green-500';
+		}
+
+		// Video files
+		if (
+			mimeType?.startsWith('video/') ||
+			/\.(mp4|avi|mov|wmv|flv|webm|mkv)$/.test(fileNameLower)
+		) {
+			return 'text-purple-500';
+		}
+
+		// Audio files
+		if (
+			mimeType?.startsWith('audio/') ||
+			/\.(mp3|wav|flac|aac|ogg)$/.test(fileNameLower)
+		) {
+			return 'text-pink-500';
+		}
+
+		// Document files
+		if (mimeType === 'application/pdf' || fileNameLower.endsWith('.pdf')) {
+			return 'text-red-500';
+		}
+
+		if (
+			mimeType?.includes('wordprocessingml') ||
+			/\.(doc|docx)$/.test(fileNameLower)
+		) {
+			return 'text-blue-600';
+		}
+
+		if (mimeType?.includes('spreadsheetml') || /\.(xls|xlsx)$/.test(fileNameLower)) {
+			return 'text-green-600';
+		}
+
+		if (mimeType?.includes('presentationml') || /\.(ppt|pptx)$/.test(fileNameLower)) {
+			return 'text-orange-500';
+		}
+
+		// Archive files
+		if (/\.(zip|rar|7z|tar|gz)$/.test(fileNameLower)) {
+			return 'text-yellow-600';
+		}
+
+		// Text files
+		if (
+			mimeType?.startsWith('text/') ||
+			/\.(txt|md|json|xml|html|css|js|ts)$/.test(fileNameLower)
+		) {
+			return 'text-gray-600';
+		}
+
+		// Default color
+		return 'text-gray-500';
 	}
 
 	getFileType(fileName: string): string {
