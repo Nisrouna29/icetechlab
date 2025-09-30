@@ -51,7 +51,7 @@ export class FileManagerService {
 	private _missingFolderName = signal<string | null>(null);
 	private _itemToRename = signal<FileItem | null>(null);
 	private _itemToMove = signal<FileItem | null>(null);
-	private _itemsToDelete = signal<string[]>([]);
+	private _itemToDelete = signal<FileItem | null>(null);
 	private _allFolders = signal<FileItem[]>([]);
 	private _folderItemCounts = signal<Map<string, number>>(new Map());
 	private _lastValidPath: string[] = [];
@@ -68,7 +68,7 @@ export class FileManagerService {
 	missingFolderName = computed(() => this._missingFolderName());
 	itemToRename = computed(() => this._itemToRename());
 	itemToMove = computed(() => this._itemToMove());
-	itemsToDelete = computed(() => this._itemsToDelete());
+	itemToDelete = computed(() => this._itemToDelete());
 	allFolders = computed(() => this._allFolders());
 	folderItemCounts = computed(() => this._folderItemCounts());
 
@@ -1066,17 +1066,17 @@ export class FileManagerService {
 	}
 
 	/**
-	 * Set items to delete
+	 * Set item to delete
 	 */
-	setItemsToDelete(itemIds: string[]): void {
-		this._itemsToDelete.set(itemIds);
+	setItemToDelete(item: FileItem): void {
+		this._itemToDelete.set(item);
 	}
 
 	/**
-	 * Clear items to delete
+	 * Clear item to delete
 	 */
-	clearItemsToDelete(): void {
-		this._itemsToDelete.set([]);
+	clearItemToDelete(): void {
+		this._itemToDelete.set(null);
 	}
 
 	/**

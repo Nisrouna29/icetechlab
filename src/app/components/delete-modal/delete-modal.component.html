@@ -17,7 +17,7 @@
 					<i class="fa-solid fa-exclamation-triangle text-red-600 text-xl"></i>
 				</div>
 				<div>
-					<h3 class="font-semibold text-gray-800">Delete Items</h3>
+					<h3 class="font-semibold text-gray-800">Delete {{ itemToDelete()?.type === 'folder' ? 'Folder' : 'File' }}</h3>
 					<p class="text-sm text-gray-600">{{ deleteMessage() }}</p>
 				</div>
 			</div>

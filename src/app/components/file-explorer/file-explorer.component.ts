@@ -231,7 +231,7 @@ export class FileExplorerComponent implements OnInit {
         this.modalService.showRenameModal();
         break;
       case "delete":
-        this.fileManagerService.setItemsToDelete([file.id]);
+        this.fileManagerService.setItemToDelete(file);
         this.modalService.showDeleteModal();
         break;
       case "download":
