@@ -10,10 +10,7 @@
 				[viewMode]="viewMode()"
 				(onNavigateToRoot)="navigateToRoot()"
 				(onNavigateToPath)="navigateToPath($event)"
-				(onNavigateBack)="navigateBack()"
-				(onNavigateForward)="navigateForward()"
 				(onRefresh)="refresh()"
-				(onToggleViewMode)="toggleViewMode()"
 				(onSetViewMode)="setViewMode($event)">
 			</app-breadcrumb>
 		</div>
@@ -22,11 +19,8 @@
 		<div class="bg-white border-b border-gray-200 px-4 py-2">
 			<app-toolbar
 				[selectedCount]="selectedItems().size"
-				[viewMode]="viewMode()"
 				(onNewFolder)="showNewFolderModal()"
-				(onDelete)="modalService.showDeleteModal()"
-				(onToggleViewMode)="toggleViewMode()"
-				(onSetViewMode)="setViewMode($event)">
+				(onDelete)="modalService.showDeleteModal()">
 			</app-toolbar>
 		</div>
 

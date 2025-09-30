@@ -266,34 +266,8 @@ export class FileExplorerComponent implements OnInit {
 		}
 	}
 
-	navigateBack() {
-		this.fileManagerService.navigateBack();
-		// Update URL after navigation
-		const currentPath = this.fileManagerService.currentPath();
-		if (currentPath.length === 0) {
-			this.router.navigate(['']);
-		} else {
-			this.router.navigate(['/', ...currentPath]);
-		}
-	}
-
-	navigateForward() {
-		this.fileManagerService.navigateForward();
-		// Update URL after navigation
-		const currentPath = this.fileManagerService.currentPath();
-		if (currentPath.length === 0) {
-			this.router.navigate(['']);
-		} else {
-			this.router.navigate(['/', ...currentPath]);
-		}
-	}
-
 	refresh() {
 		this.fileManagerService.refresh();
-	}
-
-	toggleViewMode() {
-		this.viewMode.update(mode => (mode === 'grid' ? 'list' : 'grid'));
 	}
 
 	setViewMode(mode: 'grid' | 'list') {

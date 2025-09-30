@@ -21,16 +21,10 @@ export class ToolbarComponent {
 
 	// Inputs
 	@Input() selectedCount: number = 0;
-	@Input() viewMode: 'grid' | 'list' = 'grid';
 
 	@Output() onNewFolder = new EventEmitter<void>();
-	@Output() onSetViewMode = new EventEmitter<'grid' | 'list'>();
 
 	itemCount = computed(() => this.fileManagerService.files().length);
-
-	setViewMode(mode: 'grid' | 'list') {
-		this.onSetViewMode.emit(mode);
-	}
 
 	showNewFolderModal() {
 		this.onNewFolder.emit();

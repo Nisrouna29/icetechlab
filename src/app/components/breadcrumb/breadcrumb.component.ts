@@ -25,10 +25,7 @@ export class BreadcrumbComponent {
 	// Outputs
 	@Output() onNavigateToRoot = new EventEmitter<void>();
 	@Output() onNavigateToPath = new EventEmitter<string[]>();
-	@Output() onNavigateBack = new EventEmitter<void>();
-	@Output() onNavigateForward = new EventEmitter<void>();
 	@Output() onRefresh = new EventEmitter<void>();
-	@Output() onToggleViewMode = new EventEmitter<void>();
 	@Output() onSetViewMode = new EventEmitter<'grid' | 'list'>();
 
 	// Computed signals
@@ -44,21 +41,10 @@ export class BreadcrumbComponent {
 		this.onNavigateToPath.emit(path);
 	}
 
-	navigateBack() {
-		this.onNavigateBack.emit();
-	}
-
-	navigateForward() {
-		this.onNavigateForward.emit();
-	}
-
 	refresh() {
 		this.onRefresh.emit();
 	}
 
-	toggleViewMode() {
-		this.onToggleViewMode.emit();
-	}
 
 	setViewMode(mode: 'grid' | 'list') {
 		this.onSetViewMode.emit(mode);
