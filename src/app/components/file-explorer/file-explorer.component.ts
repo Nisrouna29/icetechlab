@@ -191,13 +191,14 @@ export class FileExplorerComponent implements OnInit {
 		// Clear selection and navigate/open
 		this.fileManagerService.clearSelection();
 		if (file.type === 'folder') {
-			// Navigate to folder using the full path
+			// Always use navigateToPath with folder ID for consistency
 			const currentPath = this.currentPath();
-			// Filter out 'home' from the path
-			const filteredPath = currentPath.filter(segment => segment !== 'home');
-			const newPath = [...filteredPath, file.name];
-			// Navigate directly using the folder ID for faster loading
+			const newPath = [...currentPath, file.name];
+			
+			// Use navigateToPath with the folder ID to avoid path resolution issues
 			this.fileManagerService.navigateToPath(newPath, file.id);
+			
+			// Navigate to the URL path
 			this.router.navigate(['/', ...newPath]);
 		}
 		// For files, do nothing when clicked
