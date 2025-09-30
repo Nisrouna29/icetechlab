@@ -211,8 +211,7 @@ export class MoveModalComponent {
 		if (itemToMove) {
 			this.fileManagerService.moveItem(itemToMove.id, destination).subscribe({
 				next: () => {
-					// Refresh the folder list to update the tree
-					this.fileManagerService.getAllFolders().subscribe();
+					// Folder refresh and count updates are handled in the file manager service
 					this.fileManagerService.clearItemToMove();
 					this.close();
 				},

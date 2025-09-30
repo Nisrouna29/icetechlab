@@ -949,8 +949,18 @@ export class FileManagerService {
 			tap(fileItem => {
 				// Reload current folder to reflect changes
 				this.loadFolderContents(this._currentFolderId());
-				// Refresh folder item counts to update counts in all folders
-				this.refreshFolderCounts();
+				// Refresh all folders first, then refresh counts
+				this.refreshAllFolders().subscribe({
+					next: () => {
+						// Now refresh folder counts with updated folder list
+						this.refreshFolderCounts();
+					},
+					error: error => {
+						console.error('Error refreshing folders:', error);
+						// Still try to refresh counts even if folder refresh fails
+						this.refreshFolderCounts();
+					},
+				});
 				// Show success snackbar
 				const destination = newParentId ? 'folder' : 'root';
 				this.snackbarService.success(
