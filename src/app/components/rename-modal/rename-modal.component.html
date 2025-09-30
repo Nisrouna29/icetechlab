@@ -8,9 +8,19 @@
 		<input
 			id="renameInput"
 			type="text"
-			class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+			class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent mb-2"
+			[class.border-red-500]="validationError()"
+			[class.border-gray-300]="!validationError()"
+			[class.focus:ring-red-500]="validationError()"
+			[class.focus:ring-blue-500]="!validationError()"
 			[(ngModel)]="newName"
+			(input)="onNameChange()"
 			(keydown.enter)="confirmRename()" />
+		@if (validationError()) {
+			<div class="text-red-600 text-sm mb-4">
+				{{ validationError() }}
+			</div>
+		}
 		<div class="flex justify-end space-x-3">
 			<button
 				class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
@@ -18,9 +28,9 @@
 				Cancel
 			</button>
 			<button
-				class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
+				class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
 				(click)="confirmRename()"
-				[disabled]="!newName.trim()">
+				[disabled]="!newName.trim() || validationError()">
 				Rename
 			</button>
 		</div>

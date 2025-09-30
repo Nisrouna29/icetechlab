@@ -17,8 +17,10 @@ export class NewFolderModalComponent {
 	private snackbarService = inject(SnackbarService);
 
 	folderName = '';
+	private _validationError = signal<string | null>(null);
 
 	isVisible = computed(() => this.modalService.newFolderModal());
+	validationError = this._validationError.asReadonly();
 
 	constructor() {
 		// Focus input when modal becomes visible
@@ -39,6 +41,24 @@ export class NewFolderModalComponent {
 	close() {
 		this.modalService.hideNewFolderModal();
 		this.folderName = '';
+		this._validationError.set(null);
+	}
+
+	validateName(name: string): boolean {
+		const invalidChars = /[\/\\:*?"<>|]/;
+		if (invalidChars.test(name)) {
+			this._validationError.set('Folder name contains invalid characters: / \\ : * ? " < > |');
+			return false;
+		}
+		this._validationError.set(null);
+		return true;
+	}
+
+	onNameChange() {
+		// Clear validation error when user starts typing
+		if (this._validationError()) {
+			this._validationError.set(null);
+		}
 	}
 
 	createFolder() {
@@ -49,11 +69,7 @@ export class NewFolderModalComponent {
 		}
 
 		// Validate folder name
-		const invalidChars = /[\/\\:*?"<>|]/;
-		if (invalidChars.test(name)) {
-			this.snackbarService.error(
-				'Folder name contains invalid characters: / \\ : * ? " < > |'
-			);
+		if (!this.validateName(name)) {
 			return;
 		}
 

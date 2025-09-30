@@ -17,9 +17,11 @@ export class RenameModalComponent {
 	private snackbarService = inject(SnackbarService);
 
 	newName = '';
+	private _validationError = signal<string | null>(null);
 
 	isVisible = computed(() => this.modalService.renameModal());
 	itemToRename = computed(() => this.fileManagerService.itemToRename());
+	validationError = this._validationError.asReadonly();
 
 	constructor() {
 		// Focus and select input when modal becomes visible
@@ -44,6 +46,24 @@ export class RenameModalComponent {
 		this.modalService.hideRenameModal();
 		this.fileManagerService.clearItemToRename();
 		this.newName = '';
+		this._validationError.set(null);
+	}
+
+	validateName(name: string): boolean {
+		const invalidChars = /[\/\\:*?"<>|]/;
+		if (invalidChars.test(name)) {
+			this._validationError.set('Name contains invalid characters: / \\ : * ? " < > |');
+			return false;
+		}
+		this._validationError.set(null);
+		return true;
+	}
+
+	onNameChange() {
+		// Clear validation error when user starts typing
+		if (this._validationError()) {
+			this._validationError.set(null);
+		}
 	}
 
 	confirmRename() {
@@ -55,9 +75,7 @@ export class RenameModalComponent {
 		}
 
 		// Validate name
-		const invalidChars = /[\/\\:*?"<>|]/;
-		if (invalidChars.test(name)) {
-			console.error('Name contains invalid characters');
+		if (!this.validateName(name)) {
 			return;
 		}
 

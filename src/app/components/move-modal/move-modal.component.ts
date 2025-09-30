@@ -5,7 +5,6 @@ import {
 	FileItem,
 } from '../../services/file-manager.service';
 import { ModalService } from '../../services/modal.service';
-import { SnackbarService } from '../../services/snackbar.service';
 
 interface FolderTreeNode {
 	folder: FileItem;
@@ -24,7 +23,6 @@ interface FolderTreeNode {
 export class MoveModalComponent {
 	private fileManagerService = inject(FileManagerService);
 	private modalService = inject(ModalService);
-	private snackbarService = inject(SnackbarService);
 
 	private _selectedDestination = signal<string | null>(null);
 	private _expandedFolders = signal<Set<string>>(new Set());
