@@ -29,8 +29,6 @@ export class BreadcrumbComponent {
 
 	// Computed signals
 	breadcrumbPath = computed(() => this.fileManagerService.breadcrumbPath());
-	canGoBack = computed(() => this.fileManagerService.canGoBack());
-	canGoForward = computed(() => this.fileManagerService.canGoForward());
 
 	navigateToRoot() {
 		this.onNavigateToRoot.emit();
