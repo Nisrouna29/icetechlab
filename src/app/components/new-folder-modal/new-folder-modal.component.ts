@@ -2,6 +2,7 @@ import { Component, signal, computed, inject, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FileManagerService } from '../../services/file-manager.service';
 import { ModalService } from '../../services/modal.service';
+import { finalize } from 'rxjs';
 
 @Component({
 	selector: 'app-new-folder-modal',
@@ -71,16 +72,6 @@ export class NewFolderModalComponent {
 			return;
 		}
 
-		this.fileManagerService.createFolder(name).subscribe({
-			next: newFolder => {
-				// Success handling is done in the file manager service
-				this.close();
-			},
-			error: error => {
-				// Error handling is done in the file manager service
-				// Just close the modal on error
-				this.close();
-			},
-		});
+		this.fileManagerService.createFolder(name).pipe(finalize(()=>{	this.close();})).subscribe();
 	}
 }

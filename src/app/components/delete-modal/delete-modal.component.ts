@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { FileManagerService } from '../../services/file-manager.service';
 import { ModalService } from '../../services/modal.service';
+import { finalize } from 'rxjs';
 
 @Component({
 	selector: 'app-delete-modal',
@@ -32,16 +33,6 @@ export class DeleteModalComponent {
 		const item = this.itemToDelete();
 		if (!item) return;
 
-		this.fileManagerService.deleteItem(item).subscribe({
-			next: () => {
-				// Success handling is done in the file manager service
-				this.close();
-			},
-			error: error => {
-				// Error handling is done in the file manager service
-				// Just close the modal on error
-				this.close();
-			},
-		});
+		this.fileManagerService.deleteItem(item).pipe(finalize((()=>{	this.close();}))).subscribe();
 	}
 }
