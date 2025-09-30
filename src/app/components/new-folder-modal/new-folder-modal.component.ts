@@ -2,7 +2,6 @@ import { Component, signal, computed, inject, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FileManagerService } from '../../services/file-manager.service';
 import { ModalService } from '../../services/modal.service';
-import { SnackbarService } from '../../services/snackbar.service';
 
 @Component({
 	selector: 'app-new-folder-modal',
@@ -14,7 +13,6 @@ import { SnackbarService } from '../../services/snackbar.service';
 export class NewFolderModalComponent {
 	private fileManagerService = inject(FileManagerService);
 	private modalService = inject(ModalService);
-	private snackbarService = inject(SnackbarService);
 
 	folderName = '';
 	private _validationError = signal<string | null>(null);

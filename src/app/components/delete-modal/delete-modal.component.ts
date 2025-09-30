@@ -1,7 +1,6 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { FileManagerService } from '../../services/file-manager.service';
 import { ModalService } from '../../services/modal.service';
-import { SnackbarService } from '../../services/snackbar.service';
 
 @Component({
 	selector: 'app-delete-modal',
@@ -12,7 +11,6 @@ import { SnackbarService } from '../../services/snackbar.service';
 export class DeleteModalComponent {
 	private fileManagerService = inject(FileManagerService);
 	private modalService = inject(ModalService);
-	private snackbarService = inject(SnackbarService);
 
 	isVisible = computed(() => this.modalService.deleteModal());
 	itemToDelete = computed(() => this.fileManagerService.itemToDelete());
