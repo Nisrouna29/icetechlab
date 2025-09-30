@@ -553,4 +553,8 @@ export class FileUploadComponent {
 	getFileColor(fileName: string): string {
 		return this.fileManagerService.getFileColor(fileName);
 	}
+
+	formatFileSize(bytes: number): string {
+		return this.fileManagerService.formatFileSize(bytes);
+	}
 }
