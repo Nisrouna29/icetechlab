@@ -72,16 +72,6 @@ export class NewFolderModalComponent {
 						error.message.includes('duplicate')
 					) {
 						errorMessage = `A folder with the name "${name}" already exists`;
-					} else if (
-						error.message.includes('invalid') ||
-						error.message.includes('bad request')
-					) {
-						errorMessage = 'Invalid folder name. Please use a different name.';
-					} else if (
-						error.message.includes('permission') ||
-						error.message.includes('unauthorized')
-					) {
-						errorMessage = 'You do not have permission to create folders here';
 					} else {
 						errorMessage = error.message;
 					}
