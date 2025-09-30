@@ -121,9 +121,9 @@ export class FileManagerService {
       id: apiItem.id,
       name: apiItem.name,
       type: apiItem.folder ? "folder" : "file",
-      size: apiItem.folder
-        ? "Loading..."
-        : this.apiService.formatFileSize(apiItem.size || 0),
+       size: apiItem.folder
+         ? "Loading..."
+         : this.formatFileSize(apiItem.size || 0),
       modified: new Date(apiItem.modification).toLocaleDateString(),
       icon: this.getFileIcon(apiItem.name, apiItem.folder, apiItem.mimeType),
       color: this.getFileColor(apiItem.name, apiItem.folder, apiItem.mimeType),
@@ -1196,12 +1196,26 @@ export class FileManagerService {
     this._itemToDelete.set(item);
   }
 
-  /**
-   * Clear item to delete
-   */
-  clearItemToDelete(): void {
-    this._itemToDelete.set(null);
-  }
+   /**
+    * Clear item to delete
+    */
+   clearItemToDelete(): void {
+     this._itemToDelete.set(null);
+   }
+
+   /**
+    * Format file size for display
+    * @param bytes - File size in bytes
+    */
+   formatFileSize(bytes: number): string {
+     if (bytes === 0) return "0 B";
+
+     const k = 1024;
+     const sizes = ["B", "KB", "MB", "GB"];
+     const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+   }
 
   /**
    * Get the last valid path when a folder doesn't exist
