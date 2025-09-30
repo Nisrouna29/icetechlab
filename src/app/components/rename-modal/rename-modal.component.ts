@@ -2,7 +2,6 @@ import { Component, signal, computed, inject, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FileManagerService } from '../../services/file-manager.service';
 import { ModalService } from '../../services/modal.service';
-import { SnackbarService } from '../../services/snackbar.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -15,7 +14,6 @@ import { finalize } from 'rxjs';
 export class RenameModalComponent {
 	private fileManagerService = inject(FileManagerService);
 	private modalService = inject(ModalService);
-	private snackbarService = inject(SnackbarService);
 
 	newName = '';
 	private _validationError = signal<string | null>(null);
