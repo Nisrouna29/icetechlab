@@ -16,14 +16,7 @@ export class FileItemComponent {
 	@Input() isSelected: boolean = false;
 
 	@Output() onClick = new EventEmitter<FileItem>();
-	@Output() onToggleSelection = new EventEmitter<string>();
-	@Output() onSelectRange = new EventEmitter<string>();
 	@Output() onAction = new EventEmitter<{ action: string; file: FileItem }>();
-	@Output() onContextMenu = new EventEmitter<{
-		file: FileItem;
-		x: number;
-		y: number;
-	}>();
 
 	onItemClick(event: MouseEvent) {
 		// Don't handle click if it's on action buttons

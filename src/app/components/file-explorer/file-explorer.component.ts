@@ -204,14 +204,6 @@ export class FileExplorerComponent implements OnInit {
 		// For files, do nothing when clicked
 	}
 
-	toggleSelection(fileId: string) {
-		this.fileManagerService.toggleSelection(fileId);
-	}
-
-	selectRange(fileId: string) {
-		// TODO: Implement range selection
-		this.fileManagerService.toggleSelection(fileId);
-	}
 
 	isSelected(fileId: string): boolean {
 		return this.fileManagerService.isSelected(fileId);

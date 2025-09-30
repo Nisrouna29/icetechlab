@@ -2,9 +2,7 @@
 	class="group bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-3 sm:p-4 cursor-pointer border border-gray-200 hover:border-blue-300"
 	[class.border-blue-500]="isSelected"
 	[class.bg-blue-50]="isSelected"
-	(click)="onItemClick($event)"
-	(ctrlClick)="onToggleSelection.emit(file.id)"
-	(shiftClick)="onSelectRange.emit(file.id)">
+	(click)="onItemClick($event)">
 	<div class="flex flex-col items-center">
 		<div class="mb-2 sm:mb-3">
 			@if (file.type === 'folder') {

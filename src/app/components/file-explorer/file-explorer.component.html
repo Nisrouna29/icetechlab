@@ -57,10 +57,7 @@
 							[viewMode]="viewMode()"
 							[isSelected]="isSelected(file.id)"
 							(onClick)="onFileClick($event)"
-							(onToggleSelection)="toggleSelection($event)"
-							(onSelectRange)="selectRange($event)"
-							(onAction)="onFileAction($event.action, $event.file)"
-							(onContextMenu)="fileManagerService.showContextMenu($event.file, $event.x, $event.y)">
+							(onAction)="onFileAction($event.action, $event.file)">
 						</app-file-item>
 						}
 					</div>
