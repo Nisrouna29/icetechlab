@@ -66,9 +66,9 @@ export class RenameModalComponent {
 				this.close();
 			},
 			error: error => {
-				this.snackbarService.error(
-					`Failed to rename "${item.name}": ${error.message || 'Unknown error'}`
-				);
+				// Error handling is done in the file manager service
+				// Just close the modal on error
+				this.close();
 			},
 		});
 	}

@@ -217,10 +217,9 @@ export class MoveModalComponent {
 					this.close();
 				},
 				error: error => {
-					console.error('Error moving item:', error);
-					this.snackbarService.error(
-						`Failed to move "${itemToMove.name}": ${error.message || 'Unknown error'}`
-					);
+					// Error handling is done in the file manager service
+					// Just close the modal on error
+					this.close();
 				},
 			});
 		}
