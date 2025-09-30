@@ -1130,14 +1130,56 @@ export class FileManagerService {
 	getFileType(fileName: string): string {
 		const extension = fileName.split('.').pop()?.toLowerCase();
 		const typeMap: { [key: string]: string } = {
+			// Documents
 			pdf: 'PDF Document',
+			doc: 'Word Document',
 			docx: 'Word Document',
+			xls: 'Excel Spreadsheet',
 			xlsx: 'Excel Spreadsheet',
+			ppt: 'PowerPoint Presentation',
 			pptx: 'PowerPoint Presentation',
+			
+			// Images
 			jpg: 'JPEG Image',
+			jpeg: 'JPEG Image',
 			png: 'PNG Image',
+			gif: 'GIF Image',
+			bmp: 'Bitmap Image',
+			svg: 'SVG Vector Image',
+			webp: 'WebP Image',
+			
+			// Videos
 			mp4: 'MP4 Video',
+			avi: 'AVI Video',
+			mov: 'QuickTime Video',
+			wmv: 'Windows Media Video',
+			flv: 'Flash Video',
+			webm: 'WebM Video',
+			mkv: 'Matroska Video',
+			
+			// Audio
+			mp3: 'MP3 Audio',
+			wav: 'WAV Audio',
+			flac: 'FLAC Audio',
+			aac: 'AAC Audio',
+			ogg: 'OGG Audio',
+			
+			// Archives
 			zip: 'ZIP Archive',
+			rar: 'RAR Archive',
+			'7z': '7-Zip Archive',
+			tar: 'TAR Archive',
+			gz: 'GZIP Archive',
+			
+			// Text/Code files
+			txt: 'Text File',
+			md: 'Markdown File',
+			json: 'JSON File',
+			xml: 'XML File',
+			html: 'HTML File',
+			css: 'CSS Stylesheet',
+			js: 'JavaScript File',
+			ts: 'TypeScript File',
 		};
 		return typeMap[extension || ''] || 'Unknown File';
 	}
