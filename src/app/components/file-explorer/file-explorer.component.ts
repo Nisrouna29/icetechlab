@@ -212,6 +212,11 @@ export class FileExplorerComponent implements OnInit {
 
       // Navigate to the URL path
       this.router.navigate(["/", ...newPath]);
+
+      // Refresh folder counts after navigation
+      setTimeout(() => {
+        this.fileManagerService.refreshCurrentFolderItemCounts();
+      }, 100);
     }
     // For files, do nothing when clicked
   }
@@ -291,6 +296,8 @@ export class FileExplorerComponent implements OnInit {
         finalize(() => {
           // Still try to refresh counts even if folder refresh fails
           this.fileManagerService.refreshFolderCounts();
+          // Also refresh current folder counts
+          this.fileManagerService.refreshCurrentFolderItemCounts();
         })
       )
       .subscribe();

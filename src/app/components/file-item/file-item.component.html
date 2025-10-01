@@ -20,7 +20,13 @@
 			class="text-xs sm:text-sm font-medium text-gray-900 text-center truncate w-full"
 			>{{ file.name }}</span
 		>
-		<span class="text-xs text-gray-500 mt-1"> {{ file.size }} </span>
+		<span class="text-xs text-gray-500 mt-1"> 
+			@if (file.type === 'folder') {
+				{{ folderCountText() }}
+			} @else {
+				{{ file.size }}
+			}
+		</span>
 	</div>
 	<div class="mt-2 sm:mt-3 opacity-100 transition-opacity">
 		<div class="flex justify-center space-x-1 sm:space-x-2">

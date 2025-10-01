@@ -164,6 +164,39 @@ export class FileManagerService {
     });
   }
 
+  // Method to refresh counts for current folder items
+  refreshCurrentFolderCounts(): void {
+    const currentFiles = this._files();
+    const folderItems = currentFiles.filter(file => file.type === 'folder');
+    
+    if (folderItems.length === 0) {
+      return;
+    }
+
+    const countObservables = folderItems.map((folder) =>
+      this.apiService
+        .getItems(folder.id)
+        .pipe(map((items) => ({ folderId: folder.id, count: items.length })))
+    );
+
+    combineLatest(countObservables).subscribe({
+      next: (results) => {
+        const currentCounts = this._folderItemCounts();
+        const newCounts = new Map(currentCounts);
+        
+        results.forEach((result) => {
+          newCounts.set(result.folderId, result.count);
+        });
+        
+        this._folderItemCounts.set(newCounts);
+        this.updateFolderSizes();
+      },
+      error: (error) => {
+        console.error("Error refreshing current folder counts:", error);
+      },
+    });
+  }
+
   private updateFolderSizes(): void {
     const currentFiles = this._files();
     const counts = this._folderItemCounts();
@@ -185,6 +218,11 @@ export class FileManagerService {
 
   refreshFolderCounts(): void {
     this.loadFolderItemCounts();
+  }
+
+  // Public method to refresh counts for current folder items
+  refreshCurrentFolderItemCounts(): void {
+    this.refreshCurrentFolderCounts();
   }
 
   refreshAllFolders(): Observable<FileItem[]> {
@@ -346,6 +384,9 @@ export class FileManagerService {
 
         // Update folder sizes if counts are available
         this.updateFolderSizes();
+        
+        // Refresh counts for the current folder items
+        this.refreshCurrentFolderCounts();
       },
       error: (error) => {
         console.error("Error loading folder contents:", error);
