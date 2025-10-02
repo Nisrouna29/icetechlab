@@ -139,46 +139,33 @@ export class FileManagerService {
   }
 
   private loadFolderItemCounts(): void {
-    // Get all folders and load their item counts
-    const folders = this._allFolders();
+    // Only load counts for folders that are currently visible
+    // This avoids loading counts for all folders at once
+    const currentFiles = this._files();
+    const visibleFolders = currentFiles.filter(file => file.type === 'folder');
 
-    if (folders.length === 0) {
+    if (visibleFolders.length === 0) {
       return;
     }
 
-    const countObservables = folders.map((folder) =>
-      this.apiService
-        .getItems(folder.id)
-        .pipe(map((items) => ({ folderId: folder.id, count: items.length })))
-    );
+    // Limit concurrent requests to avoid resource exhaustion
+    const maxConcurrent = 5;
+    const batches = [];
+    for (let i = 0; i < visibleFolders.length; i += maxConcurrent) {
+      batches.push(visibleFolders.slice(i, i + maxConcurrent));
+    }
 
-    combineLatest(countObservables).subscribe({
-      next: (results) => {
-        const newCounts = new Map<string, number>();
-        results.forEach((result) => {
-          newCounts.set(result.folderId, result.count);
-        });
-        this._folderItemCounts.set(newCounts);
-
-        // Update folder sizes in the current files list
-        this.updateFolderSizes();
-      },
-      error: (error) => {
-        console.error("Error loading folder item counts:", error);
-      },
-    });
+    // Process batches sequentially
+    this.processInitialCountBatches(batches, 0);
   }
 
-  // Method to refresh counts for current folder items
-  refreshCurrentFolderCounts(): void {
-    const currentFiles = this._files();
-    const folderItems = currentFiles.filter(file => file.type === 'folder');
-    
-    if (folderItems.length === 0) {
+  private processInitialCountBatches(batches: any[][], batchIndex: number): void {
+    if (batchIndex >= batches.length) {
       return;
     }
 
-    const countObservables = folderItems.map((folder) =>
+    const batch = batches[batchIndex];
+    const countObservables = batch.map((folder) =>
       this.apiService
         .getItems(folder.id)
         .pipe(map((items) => ({ folderId: folder.id, count: items.length })))
@@ -195,9 +182,77 @@ export class FileManagerService {
         
         this._folderItemCounts.set(newCounts);
         this.updateFolderSizes();
+        
+        // Process next batch after a short delay
+        setTimeout(() => {
+          this.processInitialCountBatches(batches, batchIndex + 1);
+        }, 100);
+      },
+      error: (error) => {
+        console.error("Error loading folder item counts:", error);
+        // Continue with next batch even if current batch fails
+        setTimeout(() => {
+          this.processInitialCountBatches(batches, batchIndex + 1);
+        }, 100);
+      },
+    });
+  }
+
+  // Method to refresh counts for current folder items
+  refreshCurrentFolderCounts(): void {
+    const currentFiles = this._files();
+    const folderItems = currentFiles.filter(file => file.type === 'folder');
+    
+    if (folderItems.length === 0) {
+      return;
+    }
+
+    // Limit concurrent requests to avoid resource exhaustion
+    const maxConcurrent = 5;
+    const batches = [];
+    for (let i = 0; i < folderItems.length; i += maxConcurrent) {
+      batches.push(folderItems.slice(i, i + maxConcurrent));
+    }
+
+    // Process batches sequentially
+    this.processCountBatches(batches, 0);
+  }
+
+  private processCountBatches(batches: any[][], batchIndex: number): void {
+    if (batchIndex >= batches.length) {
+      return;
+    }
+
+    const batch = batches[batchIndex];
+    const countObservables = batch.map((folder) =>
+      this.apiService
+        .getItems(folder.id)
+        .pipe(map((items) => ({ folderId: folder.id, count: items.length })))
+    );
+
+    combineLatest(countObservables).subscribe({
+      next: (results) => {
+        const currentCounts = this._folderItemCounts();
+        const newCounts = new Map(currentCounts);
+        
+        results.forEach((result) => {
+          newCounts.set(result.folderId, result.count);
+        });
+        
+        this._folderItemCounts.set(newCounts);
+        this.updateFolderSizes();
+        
+        // Process next batch after a short delay
+        setTimeout(() => {
+          this.processCountBatches(batches, batchIndex + 1);
+        }, 100);
       },
       error: (error) => {
         console.error("Error refreshing current folder counts:", error);
+        // Continue with next batch even if current batch fails
+        setTimeout(() => {
+          this.processCountBatches(batches, batchIndex + 1);
+        }, 100);
       },
     });
   }
@@ -322,25 +377,23 @@ export class FileManagerService {
     );
 
     if (targetFolder) {
-      currentFolderId = targetFolder.id;
-      currentPath.push(targetFolderName);
-      // Don't set path immediately - wait for folder contents to load
-      // this._currentPath.set([...currentPath]);
-      // this._currentFolderId.set(currentFolderId);
-
+      // Create new path array with the current folder added
+      const newPath = [...currentPath, targetFolderName];
+      const newFolderId = targetFolder.id;
+      
       // Load the contents of this folder to continue navigation (without showing them)
-      this.apiService.getItems(currentFolderId).subscribe({
+      this.apiService.getItems(newFolderId).subscribe({
         next: (apiItems) => {
           // Filter items for current folder
           const filteredItems = apiItems.filter(
-            (item) => item.parentId === currentFolderId
+            (item) => item.parentId === newFolderId
           );
           this.navigateToTargetFolder(
             filteredItems,
             path,
             folderIndex + 1,
-            currentFolderId,
-            currentPath
+            newFolderId,
+            newPath
           );
         },
         error: (error) => {
@@ -350,16 +403,12 @@ export class FileManagerService {
       });
     } else {
       console.error("Folder not found:", targetFolderName);
-      console.log("Current path when folder not found:", currentPath);
-      console.log("Current folder ID when folder not found:", currentFolderId);
       // Store the missing folder name
       this._missingFolderName.set(targetFolderName);
       // Store the last valid path and folder ID for navigation (before adding the missing folder)
       // currentPath already contains the path up to the current folder, which is the last valid path
       this._lastValidPath = [...currentPath];
       this._lastValidFolderId = currentFolderId;
-      console.log("Stored last valid path:", this._lastValidPath);
-      console.log("Stored last valid folder ID:", this._lastValidFolderId);
       // If folder not found, load the current folder contents first, then set error
       this.loadFolderContents(currentFolderId, currentPath);
       // Set error after a short delay to ensure it's not cleared by loadFolderContents

@@ -76,6 +76,8 @@ export class FileExplorerComponent implements OnInit {
     // Handle errors - if folder doesn't exist, navigate to parent and show modal
     effect(() => {
       const error = this.fileManagerService.error();
+      const currentPath = this.currentPath();
+      
       if (
         error &&
         error.includes("Failed to load folder contents") &&
@@ -89,11 +91,9 @@ export class FileExplorerComponent implements OnInit {
         // Get the last valid path and navigate to it
         const lastValid = this.fileManagerService.getLastValidPath();
         const targetPath = lastValid.path;
-        console.log("Error handling - lastValid:", lastValid);
-        console.log("Error handling - targetPath:", targetPath);
 
+        // Navigate to the last valid path and show error modal
         this.router.navigate(["/", ...targetPath]).then(() => {
-          console.log("Navigation completed, loading folder content");
           // Load the folder content for the last valid path
           this.loadFolderContent(lastValid.folderId, targetPath, true);
           // Show modal after navigation and loading
@@ -120,7 +120,47 @@ export class FileExplorerComponent implements OnInit {
         const folderPath = urlSegments.map((segment) => segment.path);
         this.loadFolderByPath(folderPath);
       }
+
+      // Check for errors after a delay to allow the navigation to complete and error to be set
+      setTimeout(() => {
+        this.checkForErrors();
+      }, 200);
     });
+  }
+
+  private checkForErrors() {
+    const error = this.fileManagerService.error();
+    console.log('checkForErrors called, error:', error);
+    console.log('_errorHandled:', this._errorHandled());
+    
+    if (
+      error &&
+      error.includes("Failed to load folder contents") &&
+      !this._errorHandled()
+    ) {
+      console.log('Error detected, handling...');
+      this._errorHandled.set(true);
+      // Get the missing folder name from the service
+      const missingFolder = this.fileManagerService.missingFolderName();
+      this._missingFolderName.set(missingFolder || "Unknown");
+
+      // Get the last valid path and navigate to it
+      const lastValid = this.fileManagerService.getLastValidPath();
+      const targetPath = lastValid.path;
+      console.log('lastValid:', lastValid);
+      console.log('targetPath:', targetPath);
+
+      // Navigate to the last valid path and show error modal
+      this.router.navigate(["/", ...targetPath]).then(() => {
+        console.log('Navigation completed, loading folder content');
+        // Load the folder content for the last valid path
+        this.loadFolderContent(lastValid.folderId, targetPath, true);
+        // Show modal after navigation and loading
+        setTimeout(() => {
+          this.displayErrorModal();
+        }, 1000);
+      });
+    }
   }
 
   private loadFolderContent(
