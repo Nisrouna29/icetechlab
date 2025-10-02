@@ -42,6 +42,7 @@ export class FileManagerService {
   private _folderItemCounts = signal<Map<string, number>>(new Map());
   private _lastValidPath: string[] = [];
   private _lastValidFolderId: string | null = null;
+  private _stableBreadcrumbPath = signal<Array<{ name: string; path: string[] }>>([{ name: "Home", path: [] }]);
 
   // Computed signals
   files = computed(() => this._files());
@@ -57,6 +58,7 @@ export class FileManagerService {
   itemToDelete = computed(() => this._itemToDelete());
   allFolders = computed(() => this._allFolders());
   folderItemCounts = computed(() => this._folderItemCounts());
+  stableBreadcrumbPath = computed(() => this._stableBreadcrumbPath());
 
   // Public methods
   clearFiles() {
@@ -64,14 +66,15 @@ export class FileManagerService {
     this._isLoading.set(true);
   }
 
-  // Breadcrumb computed
-  breadcrumbPath = computed(() => {
-    const path = this._currentPath();
-    const missingFolder = this._missingFolderName();
+  // Breadcrumb computed - use stable breadcrumb to prevent flicker
+  breadcrumbPath = computed(() => this._stableBreadcrumbPath());
 
+  // Method to update stable breadcrumb path
+  private updateStableBreadcrumbPath(path: string[], missingFolder?: string | null) {
     // If we're at root (empty path), show "Home"
     if (path.length === 0) {
-      return [{ name: "Home", path: [] }];
+      this._stableBreadcrumbPath.set([{ name: "Home", path: [] }]);
+      return;
     }
 
     // Always start with Home
@@ -88,14 +91,16 @@ export class FileManagerService {
       });
     });
 
-    return breadcrumb;
-  });
+    this._stableBreadcrumbPath.set(breadcrumb);
+  }
 
   private snackbarService = inject(SnackbarService);
 
   constructor(private apiService: ApiService) {
     // Don't load root folder here - let the route handler decide what to load
     this.loadAllFolders();
+    // Initialize stable breadcrumb path
+    this.updateStableBreadcrumbPath([], null);
   }
 
   /**
@@ -232,9 +237,8 @@ export class FileManagerService {
   // Navigation methods
   navigateToFolder(folderId: string, folderName: string) {
     const newPath = [...this._currentPath(), folderName];
-    this._currentPath.set(newPath);
-    this._currentFolderId.set(folderId);
-    this.loadFolderContents(folderId);
+    // Don't set path immediately - wait for folder contents to load
+    this.loadFolderContents(folderId, newPath);
   }
 
   navigateToPath(path: string[], folderId?: string | null) {
@@ -242,15 +246,16 @@ export class FileManagerService {
     this._files.set([]);
     this._isLoading.set(true);
 
-    this._currentPath.set(path);
-    this._currentFolderId.set(folderId || null);
+    // Don't set path immediately - wait for folder contents to load
+    // this._currentPath.set(path);
+    // this._currentFolderId.set(folderId || null);
 
     // If no folderId provided, try to resolve it from the path
     if (!folderId && path.length > 0) {
       // For nested paths, we need to find the folder ID of the last folder in the path
       this.resolveFolderIdFromPath(path);
     } else {
-      this.loadFolderContents(folderId);
+      this.loadFolderContents(folderId, path);
     }
   }
 
@@ -307,7 +312,7 @@ export class FileManagerService {
   ) {
     if (folderIndex >= path.length) {
       // We've reached the end of the path, load the final folder contents
-      this.loadFolderContents(currentFolderId);
+      this.loadFolderContents(currentFolderId, currentPath);
       return;
     }
 
@@ -319,8 +324,9 @@ export class FileManagerService {
     if (targetFolder) {
       currentFolderId = targetFolder.id;
       currentPath.push(targetFolderName);
-      this._currentPath.set([...currentPath]);
-      this._currentFolderId.set(currentFolderId);
+      // Don't set path immediately - wait for folder contents to load
+      // this._currentPath.set([...currentPath]);
+      // this._currentFolderId.set(currentFolderId);
 
       // Load the contents of this folder to continue navigation (without showing them)
       this.apiService.getItems(currentFolderId).subscribe({
@@ -344,13 +350,18 @@ export class FileManagerService {
       });
     } else {
       console.error("Folder not found:", targetFolderName);
+      console.log("Current path when folder not found:", currentPath);
+      console.log("Current folder ID when folder not found:", currentFolderId);
       // Store the missing folder name
       this._missingFolderName.set(targetFolderName);
-      // Store the last valid path and folder ID for navigation
+      // Store the last valid path and folder ID for navigation (before adding the missing folder)
+      // currentPath already contains the path up to the current folder, which is the last valid path
       this._lastValidPath = [...currentPath];
       this._lastValidFolderId = currentFolderId;
+      console.log("Stored last valid path:", this._lastValidPath);
+      console.log("Stored last valid folder ID:", this._lastValidFolderId);
       // If folder not found, load the current folder contents first, then set error
-      this.loadFolderContents(currentFolderId);
+      this.loadFolderContents(currentFolderId, currentPath);
       // Set error after a short delay to ensure it's not cleared by loadFolderContents
       setTimeout(() => {
         this._error.set(`Failed to load folder contents`);
@@ -358,7 +369,7 @@ export class FileManagerService {
     }
   }
 
-  private loadFolderContents(folderId?: string | null) {
+  private loadFolderContents(folderId?: string | null, path?: string[]) {
     this._isLoading.set(true);
     this._error.set(null);
     // Files already cleared in navigateToPath to prevent showing previous content
@@ -381,6 +392,14 @@ export class FileManagerService {
         this._files.set(fileItems);
         this._isLoading.set(false);
         this.clearSelection();
+
+        // Set the path and folder ID after contents are loaded for smooth navigation
+        if (path !== undefined) {
+          this._currentPath.set(path);
+          this._currentFolderId.set(folderId || null);
+          // Update stable breadcrumb path
+          this.updateStableBreadcrumbPath(path, this._missingFolderName());
+        }
 
         // Update folder sizes if counts are available
         this.updateFolderSizes();
@@ -443,7 +462,7 @@ export class FileManagerService {
         map((apiItem) => this.convertApiItemToFileItem(apiItem)),
         tap(() => {
           // Reload current folder to show the new folder
-          this.loadFolderContents(currentFolderId);
+          this.loadFolderContents(currentFolderId, this._currentPath());
           // Refresh folder counts to update all folder sizes
           this.refreshFolderCounts();
           // Refresh all folders list for move modal
@@ -868,7 +887,7 @@ export class FileManagerService {
       map((apiItem) => this.convertApiItemToFileItem(apiItem)),
       tap((fileItem) => {
         // Reload current folder to show the updated name
-        this.loadFolderContents(this._currentFolderId());
+        this.loadFolderContents(this._currentFolderId(), this._currentPath());
         // Refresh folder list for move modal if it's a folder
         if (fileItem.type === "folder") {
           this.getAllFolders().subscribe();
@@ -892,7 +911,7 @@ export class FileManagerService {
     return this.apiService.deleteItem(item.id).pipe(
       tap(() => {
         // Reload current folder to reflect changes
-        this.loadFolderContents(this._currentFolderId());
+        this.loadFolderContents(this._currentFolderId(), this._currentPath());
         // Refresh folder counts to update all folder sizes
         this.refreshFolderCounts();
         // Refresh all folders list for move modal
@@ -930,7 +949,7 @@ export class FileManagerService {
       map((apiItem) => this.convertApiItemToFileItem(apiItem)),
       tap((fileItem) => {
         // Reload current folder to reflect changes
-        this.loadFolderContents(this._currentFolderId());
+        this.loadFolderContents(this._currentFolderId(), this._currentPath());
         // Refresh all folders first, then refresh counts
         this.refreshAllFolders().subscribe({
           next: () => {
@@ -1199,7 +1218,7 @@ export class FileManagerService {
    * Refresh current folder
    */
   refresh(): void {
-    this.loadFolderContents(this._currentFolderId());
+    this.loadFolderContents(this._currentFolderId(), this._currentPath());
   }
 
   /**
